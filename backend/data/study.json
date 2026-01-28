@@ -1,0 +1,35 @@
+{
+  "tasks": [
+    {
+      "id": 1769323073179,
+      "text": "Estadistica 1",
+      "description": "Primer actividad Uedi",
+      "date": "2026-01-25",
+      "completed": true,
+      "category": "Universidad"
+    },
+    {
+      "id": 1769403444815,
+      "text": "Corto de Archivos",
+      "description": "",
+      "date": "2026-01-26",
+      "completed": true,
+      "category": "Universidad"
+    }
+  ],
+  "pomodoro": 25,
+  "pdfs": [],
+  "pdfProgress": {},
+  "concepts": [
+    {
+      "id": 1769568761636,
+      "term": "Carpeta Arbitraria",
+      "definition": "Una carpeta arbitraria es cualquier directorio o carpeta seleccionada al azar, sin restricciones específicas o predefinidas por el sistema o una aplicación"
+    },
+    {
+      "id": 1769569532518,
+      "term": "Deploy",
+      "definition": "mover una aplicación desde el entorno de desarrollo (donde se crea y prueba) al entorno de producción (donde los usuarios finales pueden utilizarla)."
+    }
+  ]
+}

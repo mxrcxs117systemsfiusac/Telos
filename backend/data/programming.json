@@ -1,0 +1,109 @@
+{
+  "checklist": [
+    {
+      "id": "html",
+      "label": "HTML5 Semantic",
+      "category": "Frontend",
+      "completed": false
+    },
+    {
+      "id": "css",
+      "label": "CSS3 + Flexbox/Grid",
+      "category": "Frontend",
+      "completed": false
+    },
+    {
+      "id": "js",
+      "label": "JavaScript ES6+",
+      "category": "Lenguajes",
+      "completed": false
+    },
+    {
+      "id": "ts",
+      "label": "TypeScript",
+      "category": "Lenguajes",
+      "completed": false
+    },
+    {
+      "id": "react",
+      "label": "React + Hooks",
+      "category": "Frontend",
+      "completed": false
+    },
+    {
+      "id": "node",
+      "label": "Node.js",
+      "category": "Backend",
+      "completed": false
+    }
+  ],
+  "sections": [
+    {
+      "id": 1,
+      "title": "General",
+      "items": [
+        {
+          "id": 1769401440564,
+          "text": "Inglés",
+          "completed": false
+        },
+        {
+          "id": 1769401448952,
+          "text": "Aprender a manejar moto",
+          "completed": false
+        },
+        {
+          "id": 1769488761542,
+          "text": "Conseguir Novia",
+          "type": "goal",
+          "completed": false,
+          "startDate": "2026-01-27",
+          "endDate": "2027-01-27",
+          "dailyLogs": {
+            "2026-01-27": {
+              "completed": true,
+              "learned": "no hubo progreso :(",
+              "notes": ""
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 1769401373509,
+      "title": "Lenguajes",
+      "items": [
+        {
+          "id": 1769401376579,
+          "text": "Python",
+          "completed": false
+        },
+        {
+          "id": 1769401380182,
+          "text": "C#",
+          "completed": false
+        },
+        {
+          "id": 1769401382432,
+          "text": "C++",
+          "completed": false
+        },
+        {
+          "id": 1769401385219,
+          "text": "Java",
+          "completed": false
+        },
+        {
+          "id": 1769401388800,
+          "text": "Javascript",
+          "completed": false
+        },
+        {
+          "id": 1769401390566,
+          "text": "Php",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}

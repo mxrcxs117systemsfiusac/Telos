@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+</head>
+
+<body>
+  <div id="global-error-display" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f1115; color: #ff5555; padding: 20px; z-index: 9999; overflow: auto; font-family: monospace;">
+    <h2 style="border-bottom: 1px solid #333; padding-bottom: 10px;">Error de Inicio (Startup Error)</h2>
+    <pre id="global-error-text" style="white-space: pre-wrap;"></pre>
+    <button onclick="window.location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 5px; cursor: pointer;">Reintentar / Reload</button>
+  </div>
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      document.getElementById('global-error-display').style.display = 'block';
+      document.getElementById('global-error-text').innerText += `[Error] ${msg}\nAt: ${url}:${line}:${col}\nstack: ${error ? error.stack : 'N/A'}\n\n`;
+      return false; 
+    };
+    window.addEventListener('unhandledrejection', function(event) {
+      document.getElementById('global-error-display').style.display = 'block';
+      document.getElementById('global-error-text').innerText += `[Promise Rejection] ${event.reason}\n\n`;
+    });
+  </script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
