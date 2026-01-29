@@ -43,16 +43,6 @@
       "title": "General",
       "items": [
         {
-          "id": 1769401440564,
-          "text": "Inglés",
-          "completed": false
-        },
-        {
-          "id": 1769401448952,
-          "text": "Aprender a manejar moto",
-          "completed": false
-        },
-        {
           "id": 1769488761542,
           "text": "Conseguir Novia",
           "type": "goal",
@@ -61,8 +51,21 @@
           "endDate": "2027-01-27",
           "dailyLogs": {
             "2026-01-27": {
-              "completed": true,
-              "learned": "no hubo progreso :(",
+              "completed": false,
+              "learned": "no le hablé a nadie hoy",
+              "notes": "",
+              "status": "not_progressed"
+            },
+            "2026-01-28": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "nop no le hablé a nadie hoy",
+              "notes": ""
+            },
+            "2026-01-29": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco le hable a nadie",
               "notes": ""
             }
           }

@@ -30,6 +30,16 @@
       "id": 1769569532518,
       "term": "Deploy",
       "definition": "mover una aplicación desde el entorno de desarrollo (donde se crea y prueba) al entorno de producción (donde los usuarios finales pueden utilizarla)."
+    },
+    {
+      "id": 1769652794777,
+      "term": "Teología",
+      "definition": "Theo que significa Dios\nLogos que significa palabra o discurso\n\nSignifica DISCURSO ACERCA DE DIOS"
+    },
+    {
+      "id": 1769652913485,
+      "term": "Telos",
+      "definition": "Telos (τέλος) es un concepto filosófico griego, fundamental en Aristóteles, que significa fin, propósito, meta o finalidad natural de un ser u objeto"
     }
   ]
 }

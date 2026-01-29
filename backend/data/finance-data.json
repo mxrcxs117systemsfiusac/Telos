@@ -26,6 +26,16 @@
       "isPaid": false,
       "gastoEstimado": 0,
       "isReceived": false
+    },
+    {
+      "id": 1769643543732,
+      "descripcion": "resto",
+      "monto": 3.04,
+      "fecha": "2026-01-28",
+      "categoria": "Salario",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
     }
   ],
   "egresos": [
@@ -52,6 +62,16 @@
       "monto": 60,
       "fecha": "2026-01-26",
       "categoria": "Otros",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769643563245,
+      "descripcion": "Tarjeta debito",
+      "monto": 11.04,
+      "fecha": "2026-01-28",
+      "categoria": "Transporte",
       "isPaid": false,
       "gastoEstimado": 0,
       "isReceived": false

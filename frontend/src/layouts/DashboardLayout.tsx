@@ -51,7 +51,7 @@ export default function DashboardLayout() {
                             <LayoutDashboard className="text-white w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="font-bold text-lg text-slate-100 leading-tight">Control Total</h1>
+                            <h1 className="font-bold text-lg text-slate-100 leading-tight">Telos</h1>
                             <p className="text-xs text-slate-500">Marcos Puluc</p>
                         </div>
                     </div>
