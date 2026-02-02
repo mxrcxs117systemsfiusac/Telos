@@ -67,44 +67,32 @@
               "status": "not_progressed",
               "learned": "hoy tampoco le hable a nadie",
               "notes": ""
+            },
+            "2026-01-30": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "nop no le hablé a nadie",
+              "notes": ""
+            },
+            "2026-01-31": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "tampoco le hablé a nadie hoy :(",
+              "notes": ""
+            },
+            "2026-02-01": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco hubo progresó",
+              "notes": ""
+            },
+            "2026-02-02": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "no le hablé a ninguna hoy",
+              "notes": ""
             }
           }
-        }
-      ]
-    },
-    {
-      "id": 1769401373509,
-      "title": "Lenguajes",
-      "items": [
-        {
-          "id": 1769401376579,
-          "text": "Python",
-          "completed": false
-        },
-        {
-          "id": 1769401380182,
-          "text": "C#",
-          "completed": false
-        },
-        {
-          "id": 1769401382432,
-          "text": "C++",
-          "completed": false
-        },
-        {
-          "id": 1769401385219,
-          "text": "Java",
-          "completed": false
-        },
-        {
-          "id": 1769401388800,
-          "text": "Javascript",
-          "completed": false
-        },
-        {
-          "id": 1769401390566,
-          "text": "Php",
-          "completed": false
         }
       ]
     }

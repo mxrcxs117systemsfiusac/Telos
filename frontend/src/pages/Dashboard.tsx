@@ -14,7 +14,7 @@ export default function Dashboard() {
     const { schedule, isLoaded: scheduleLoaded } = useSchedule();
 
     // State
-    const [tasks, setTasks] = useState<{ id: number, text: string, date: string, source: 'study' | 'plan', completed?: boolean }[]>([]);
+    const [tasks, setTasks] = useState<{ id: number, text: string, description?: string, date: string, source: 'study' | 'plan', completed?: boolean }[]>([]);
     const [verse, setVerse] = useState<{ text: string, citation: string }>({ text: "Cargando...", citation: "" });
     const [showBalance, setShowBalance] = useState(false);
 
@@ -59,6 +59,7 @@ export default function Dashboard() {
                                         allTasks.push({
                                             id: item.id,
                                             text: `Meta: ${item.text}`,
+                                            description: `Progreso diario pendiente`,
                                             date: today,
                                             source: 'plan'
                                         });
@@ -72,6 +73,9 @@ export default function Dashboard() {
                     });
                 }
             } catch (err) { console.error("Error loading plan tasks", err); }
+
+            // Sort by date (ascending)
+            allTasks.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
             setTasks(allTasks);
         };
@@ -118,29 +122,58 @@ export default function Dashboard() {
     const getNextClass = () => {
         if (!scheduleLoaded || !schedule.events.length) return null;
 
-        const dayMap: Record<number, string> = { 1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 0: 'sunday' };
+
+        const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
         const now = new Date();
-        const currentDayKey = dayMap[now.getDay()]; // e.g. 'monday'
+        const currentDayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Mon, ... 6=Sun
         const currentHour = now.getHours();
         const currentMinute = now.getMinutes();
         const currentTime = currentHour * 60 + currentMinute;
 
+        // Helper to parse time string "HH:MM" -> minutes
+        const parseTime = (t: string) => {
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + m;
+        };
+
+        // Check today first
+        const todayKey = dayOrder[currentDayIndex];
         const todayEvents = schedule.events
-            .filter(e => e.day.toLowerCase() === currentDayKey) // Normalized compare
-            .sort((a, b) => {
-                const [h1, m1] = a.start.split(':').map(Number);
-                const [h2, m2] = b.start.split(':').map(Number);
-                return (h1 * 60 + m1) - (h2 * 60 + m2);
-            });
+            .filter((e: any) => e.day.toLowerCase() === todayKey)
+            .sort((a: any, b: any) => parseTime(a.start) - parseTime(b.start));
 
-        const nextEvent = todayEvents.find(e => {
-            const [h, m] = e.start.split(':').map(Number);
-            return (h * 60 + m) > currentTime;
-        });
+        const nextToday = todayEvents.find((e: any) => parseTime(e.start) > currentTime);
+        if (nextToday) return { ...nextToday, isToday: true, dayName: todayKey };
 
-        // Loop logic: if no next event today, show first of next day? user didn't request, just "next class".
+        // Check future days
+        for (let i = 1; i < 7; i++) {
+            const nextDayIndex = (currentDayIndex + i) % 7;
+            const nextDayKey = dayOrder[nextDayIndex];
 
-        return nextEvent;
+            const nextDayEvents = schedule.events
+                .filter((e: any) => e.day.toLowerCase() === nextDayKey)
+                .sort((a: any, b: any) => parseTime(a.start) - parseTime(b.start));
+
+            if (nextDayEvents.length > 0) {
+                return { ...nextDayEvents[0], isToday: false, dayName: nextDayKey };
+            }
+        }
+
+        return null;
+    };
+
+    const translateDay = (day: string) => {
+        const days: Record<string, string> = {
+            'monday': 'Lunes',
+            'tuesday': 'Martes',
+            'wednesday': 'Miércoles',
+            'thursday': 'Jueves',
+            'friday': 'Viernes',
+            'saturday': 'Sábado',
+            'sunday': 'Domingo'
+        };
+        return days[day.toLowerCase()] || day;
     };
 
     const nextClass = getNextClass();
@@ -162,10 +195,17 @@ export default function Dashboard() {
                     {nextClass ? (
                         <>
                             <p className="text-xl font-bold mt-1 truncate">{nextClass.title}</p>
-                            <p className="text-xs text-indigo-400 mt-2">{nextClass.start} - {nextClass.end}</p>
+                            <div className="flex flex-col mt-2">
+                                <span className="text-xs text-indigo-400 font-medium">
+                                    {nextClass.isToday ? 'HOY' : translateDay(nextClass.dayName)}
+                                </span>
+                                <span className="text-xs text-slate-400">
+                                    {nextClass.start} - {nextClass.end}
+                                </span>
+                            </div>
                         </>
                     ) : (
-                        <p className="text-slate-500 italic mt-1">No hay más clases hoy</p>
+                        <p className="text-slate-500 italic mt-1">No hay clases programadas</p>
                     )}
                 </div>
                 <div className="glass-panel p-5 rounded-xl border-l-4 border-emerald-500 relative group">
@@ -264,19 +304,22 @@ export default function Dashboard() {
                                 <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
                                     <CheckCircle className="w-3 h-3" /> Tareas & Metas
                                 </h4>
-                                <div className="space-y-2">
+                                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
                                     {tasks.length === 0 ? (
                                         <p className="text-sm text-slate-500 italic">Todo completado.</p>
                                     ) : (
-                                        tasks.slice(0, 6).map((t, idx) => (
-                                            <div key={idx} className={`flex flex-col gap-1 text-sm p-2 bg-white/5 rounded border-l-2 ${t.source === 'plan' ? 'border-cyan-500' : 'border-indigo-500'}`}>
-                                                <span className="text-slate-300 line-clamp-1">{t.text}</span>
-                                                <div className="flex justify-between items-center text-xs">
-                                                    <span className={t.source === 'plan' ? 'text-cyan-400' : 'text-indigo-400'}>
-                                                        {t.source === 'plan' ? 'Meta Diaria' : 'Estudio'}
-                                                    </span>
-                                                    <span className="text-slate-500 opacity-80">{t.date}</span>
+                                        tasks.slice(0, 10).map((t, idx) => (
+                                            <div key={idx} className={`flex flex-col gap-1 text-sm p-3 bg-white/5 rounded border-l-2 ${t.source === 'plan' ? 'border-cyan-500' : 'border-indigo-500'}`}>
+                                                <div className="flex justify-between items-start">
+                                                    <span className="font-bold text-slate-200 line-clamp-1">{t.text}</span>
+                                                    <span className="text-xs text-slate-500 whitespace-nowrap">{t.date}</span>
                                                 </div>
+                                                {t.description && (
+                                                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{t.description}</p>
+                                                )}
+                                                <span className={`text-[10px] uppercase font-bold mt-1 ${t.source === 'plan' ? 'text-cyan-400' : 'text-indigo-400'}`}>
+                                                    {t.source === 'plan' ? 'Meta Diaria' : 'Estudio'}
+                                                </span>
                                             </div>
                                         ))
                                     )}

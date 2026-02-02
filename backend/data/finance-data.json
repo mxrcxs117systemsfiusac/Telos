@@ -36,6 +36,16 @@
       "isPaid": false,
       "gastoEstimado": 0,
       "isReceived": false
+    },
+    {
+      "id": 1769907872716,
+      "descripcion": "Sueldo",
+      "monto": 650,
+      "fecha": "2026-02-01",
+      "categoria": "Salario",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
     }
   ],
   "egresos": [
@@ -72,6 +82,43 @@
       "monto": 11.04,
       "fecha": "2026-01-28",
       "categoria": "Transporte",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769814484039,
+      "descripcion": "Libros Setegua (Pago Fijo)",
+      "monto": 440,
+      "fecha": "2026-01-31",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769907884498,
+      "descripcion": "Diezmo",
+      "monto": 65,
+      "fecha": "2026-02-01",
+      "categoria": "Servicios",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769907896709,
+      "descripcion": "ofrenda",
+      "monto": 10,
+      "fecha": "2026-02-01",
+      "categoria": "Otros",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769907911720,
+      "descripcion": "Cafetería iglesia",
+      "monto": 55,
+      "fecha": "2026-02-01",
+      "categoria": "Comida",
       "isPaid": false,
       "gastoEstimado": 0,
       "isReceived": false
@@ -263,10 +310,12 @@
       "monto": 440,
       "fecha": "2026-01-31",
       "categoria": "Educación",
-      "isPaid": false,
+      "isPaid": true,
       "gastoEstimado": 0,
       "isReceived": false,
-      "relatedIds": []
+      "relatedIds": [
+        1769814484039
+      ]
     }
   ],
   "metaAhorro": 23000,

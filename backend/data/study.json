@@ -15,11 +15,353 @@
       "date": "2026-01-26",
       "completed": true,
       "category": "Universidad"
+    },
+    {
+      "id": 1769653779089,
+      "text": "Historia del Cristianismo",
+      "description": "Comprobación de lectura sobre la primera parte del libro \"prácticas dudosas en el ejercicio de nuestra fe\"",
+      "date": "2026-02-18",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769653852678,
+      "text": "Historia del Cristianismo",
+      "description": "Deberá responder las preguntas que encontrará en la hoja de trabajo, las respuestas las encontrará en el libro \"Historia de la Iglesia\" de los capítulos I al IV",
+      "date": "2026-03-04",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769653936467,
+      "text": "Historia del Cristianismo",
+      "description": "Examén Parcial del capítulo I al VI del libro \"Historia de la Iglesia\"",
+      "date": "2026-03-11",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769654051240,
+      "text": "Historia del Cristianismo",
+      "description": "Deberá responder las preguntas que encontrará en la Hoja de Trabajo, las respuestas las encontrará en el Libro \"Historia de la Iglesia\" de los capítulos VII al XI.",
+      "date": "2026-04-08",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769654108372,
+      "text": "Historia del Cristianismo ",
+      "description": "Examen Final\nDeberá estudiar del capítulo VII al XI del Libro \"Historia de la Iglesia\"",
+      "date": "2026-04-15",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769654152635,
+      "text": "Historia del Cristianismo",
+      "description": "Repaso del libro \"Practicas dudosas en el ejercicio de nuestra fe\"",
+      "date": "2026-02-11",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655101195,
+      "text": "Homiletica I",
+      "description": "Consejos preliminares - paginas 43-56",
+      "date": "2026-02-05",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655144894,
+      "text": "Homiletica I",
+      "description": "Características de los sermones comunes - paginas 57-66",
+      "date": "2026-02-05",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655210268,
+      "text": "Homiletica I",
+      "description": "Características de los sermones extraordinarios - paginas 72-78",
+      "date": "2026-02-19",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655274078,
+      "text": "Homiletica I",
+      "description": "Acciones importantes para elaborar un sermón destacado - paginas 79-80",
+      "date": "2026-02-19",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655311991,
+      "text": "Homiletica I",
+      "description": "Pasos para elaborar un sermón destacada - paginas 80-99",
+      "date": "2026-03-12",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655342977,
+      "text": "Homiletica I",
+      "description": "Las partes del sermón - paginas 100-101",
+      "date": "2026-03-12",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655389032,
+      "text": "Homiletica I",
+      "description": "Ejemplos y recursos - paginas 102-133",
+      "date": "2026-03-26",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655461649,
+      "text": "Homiletica I",
+      "description": "Presentación de bosquejos: 1 sermón expositivo, 1 sermón temático y 1 sermón textual",
+      "date": "2026-02-19",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655527259,
+      "text": "Homiletica I",
+      "description": "Examen parcial\nPredicación individual en clase de un sermón expositivo. 10 minutos por alumno, deberá entregar copia del sermón expuesto(no solamente el bosquejo sino todo el sermón desarrollado)",
+      "date": "2026-02-19",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769655594551,
+      "text": "Homiletica I",
+      "description": "Examen final\npredicación individual en clase de un sermón temático. 10 minutos por alumno. Deberá entregar copia del sermón expuesto(no solamente el bosquejo sino todo sermón desarrollado).",
+      "date": "2026-03-26",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656046110,
+      "text": "Introducción a la Teología",
+      "description": "Lectura #1. La naturaleza de la Teología",
+      "date": "2026-02-10",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656086390,
+      "text": "Introducción a la Teología",
+      "description": "Lectura #2. La Cientificidad de la Teología",
+      "date": "2026-03-02",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656160983,
+      "text": "Introducción a la Teología ",
+      "description": "Examen parcial, elaborar resumen 2 págs. y 3 conclusiones personales del Video \"construyendo una teología sistemática 1ra. parte\"",
+      "date": "2026-02-23",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656218715,
+      "text": "Introducción a la Teología",
+      "description": "Examen final, elaborar resumen 2 págs. Video \"construyendo una teología sistemática 2da. parte\"",
+      "date": "2026-03-04",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656284556,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "Aspectos introductorios - paginas 1-10",
+      "date": "2026-01-30",
+      "completed": true,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656323927,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "Formación y canon del AT - paginas 11-19",
+      "date": "2026-02-06",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656363614,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "Los comienzos y el periodo patriarcal - paginas 20-30",
+      "date": "2026-02-13",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656397752,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "El éxodo y la tierra prometida",
+      "date": "2026-02-20",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656425165,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "Los jueces y el reinado de Saúl - paginas 37-43",
+      "date": "2026-02-27",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656464774,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "Reinado de David y Salomón - paginas 44-50",
+      "date": "2026-03-06",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656499217,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "La división del reino de Israel y Judá - paginas 51-62",
+      "date": "2026-03-13",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656560572,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "El exilio de Israel I - paginas 63-73",
+      "date": "2026-03-20",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656609082,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "El exilio de Israel II - paginas 74-83",
+      "date": "2026-03-27",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656636357,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "El periodo posexílico - paginas 84-98",
+      "date": "2026-04-10",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656667048,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "examen parcial",
+      "date": "2026-02-27",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656689636,
+      "text": "Introducción al Antiguo Testamento",
+      "description": "Examen final",
+      "date": "2026-04-17",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656826466,
+      "text": "Vida devocional I",
+      "description": "Presentación de Diario Devocional",
+      "date": "2026-04-01",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656847327,
+      "text": "Vida devocional I",
+      "description": "Examen final",
+      "date": "2026-04-17",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656909837,
+      "text": "Vida devocional I",
+      "description": "Capitulo I - La vida devocional y sus características - paginas 1-32",
+      "date": "2026-02-13",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656944223,
+      "text": "Vida devocional I",
+      "description": "Capitulo II - La Palabra de Dios, la Santa Biblia - paginas 33-43",
+      "date": "2026-02-27",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769656978004,
+      "text": "Vida devocional I",
+      "description": "Capitulo III y IV - la oración y llamados a ser discípulos - paginas 44-72",
+      "date": "2026-03-13",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769657105390,
+      "text": "Vida devocional I",
+      "description": "Diario devocional, del 16 de maro al 31 de marzo.\nDeberá realizar un diario devocional. Este debe contener lo siguiente:\n1. Fecha\n2. Cita bíblica\n3. Aplicación para su vida diaria\n4. Oración",
+      "date": "2026-03-16",
+      "startTime": "00:00",
+      "endTime": "23:59",
+      "completed": false,
+      "category": "SETEGUA"
+    },
+    {
+      "id": 1769658330763,
+      "text": "Estadística 1",
+      "description": "Datos cuantitativos discretos_Actividad 2",
+      "date": "2026-02-01",
+      "startTime": "21:45",
+      "endTime": "23:45",
+      "completed": true,
+      "category": "Universidad"
+    },
+    {
+      "id": 1769658414195,
+      "text": "Laboratorio manejo e implementación de archivos",
+      "description": "Realice la instalación de una distribución Linux en un equipo físico. Para esta actividad debe cumplir con los siguientes pasos:\n1. Seleccionar una distribución Linux (por ejemplo, Ubuntu, Debian, Fedora, etc.).\n2. Descargar la imagen ISO desde el sitio ofi cial.\n3. Crear un medio de instalación (USB booteable).\n4. Realizar la instalación completa en una computadora física (no se permite virtualización).\n5. Confi gurar al menos:\n\n Nombre del equipo\nUsuario y contraseña\nIdioma y zona horaria\n6. Por último, tomar una captura de pantalla de:\n\nsudo apt update\nsudo apt install lsb-release\nTerminal con el comando lsb_release -a\nY un bloc de notas con su nombre y carnet",
+      "date": "2026-02-05",
+      "startTime": "21:46",
+      "endTime": "23:59",
+      "completed": false,
+      "category": "Universidad"
+    },
+    {
+      "id": 1769658500104,
+      "text": "Matematica Aplicada 3",
+      "description": "Tarea preparatoria No. 1",
+      "date": "2026-02-19",
+      "startTime": "21:47",
+      "endTime": "23:59",
+      "completed": false,
+      "category": "Universidad"
     }
   ],
   "pomodoro": 25,
   "pdfs": [],
-  "pdfProgress": {},
+  "pdfProgress": {
+    "Sílabo Historia del Cristianismo I 2026.pdf": 4,
+    "Sílabo Homiletica I 2026.pdf": 4,
+    "Sílabo Introducción a la Teología 2026.pdf": 4,
+    "Sílabo Introducción al Antiguo Testamento 2026.pdf": 4,
+    "Sílabo Vida Devocional I 2026.pdf": 3
+  },
   "concepts": [
     {
       "id": 1769568761636,
@@ -40,6 +382,18 @@
       "id": 1769652913485,
       "term": "Telos",
       "definition": "Telos (τέλος) es un concepto filosófico griego, fundamental en Aristóteles, que significa fin, propósito, meta o finalidad natural de un ser u objeto"
+    },
+    {
+      "id": 1769655681424,
+      "term": "Estado prelapsario",
+      "definition": "se refiere, en la teología cristiana, al periodo de inocencia, pureza y armonía original de Adán y Eva en el Jardín del Edén, anterior a la desobediencia y \"caída\" (pecado original)"
     }
+  ],
+  "categories": [
+    "Universidad",
+    "Iglesia",
+    "Personal",
+    "Otro",
+    "SETEGUA"
   ]
 }
