@@ -46,6 +46,13 @@
       "isPaid": false,
       "gastoEstimado": 0,
       "isReceived": false
+    },
+    {
+      "id": 1770166153733,
+      "descripcion": "Universidad Primer Semana (Planificado)",
+      "monto": 50,
+      "fecha": "2026-02-02",
+      "categoria": "Ingreso Planificado"
     }
   ],
   "egresos": [
@@ -122,6 +129,43 @@
       "isPaid": false,
       "gastoEstimado": 0,
       "isReceived": false
+    },
+    {
+      "id": 1770165891764,
+      "descripcion": "Verdes",
+      "monto": 200,
+      "fecha": "2026-02-04",
+      "categoria": "Otros",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770165906700,
+      "descripcion": "Rosy",
+      "monto": 50,
+      "fecha": "2026-02-04",
+      "categoria": "Casa",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770166066709,
+      "descripcion": "Otros",
+      "monto": 41,
+      "fecha": "2026-02-04",
+      "categoria": "Diversión",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770166153734,
+      "descripcion": "Gasto de Universidad Primer Semana",
+      "monto": 20,
+      "fecha": "2026-02-02",
+      "categoria": "Gasto Planificado"
     }
   ],
   "pagos": [
@@ -318,18 +362,21 @@
       ]
     }
   ],
-  "metaAhorro": 23000,
-  "ahorroActual": 1000,
+  "metaAhorro": 12500,
+  "ahorroActual": 7000,
   "plannedIncomes": [
     {
-      "id": 1769236781178,
-      "descripcion": "Universidad Febrero",
-      "monto": 400,
-      "gastoEstimado": 200,
-      "fecha": "2026-02-28",
+      "id": 1770166150745,
+      "descripcion": "Universidad Primer Semana",
+      "monto": 50,
+      "gastoEstimado": 20,
+      "fecha": "2026-02-02",
       "categoria": "Planificado",
-      "isReceived": false,
-      "relatedIds": []
+      "isReceived": true,
+      "relatedIds": [
+        1770166153733,
+        1770166153734
+      ]
     },
     {
       "id": 1769237935207,
@@ -440,5 +487,5 @@
       "isReceived": false
     }
   ],
-  "savingsImage": "/images/Moto.jpg"
+  "savingsImage": "/images/WhatsApp_Image_2026-01-30_at_8.26.29_PM__2_.jpeg"
 }

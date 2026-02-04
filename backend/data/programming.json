@@ -91,6 +91,18 @@
               "status": "not_progressed",
               "learned": "no le hablé a ninguna hoy",
               "notes": ""
+            },
+            "2026-02-03": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco le hablé a ninguna",
+              "notes": ""
+            },
+            "2026-02-04": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco le hablé a nadie",
+              "notes": ""
             }
           }
         }
