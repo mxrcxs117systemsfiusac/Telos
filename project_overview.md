@@ -1,6 +1,6 @@
-# Documentación Técnica del Proyecto: Finance Tracker
+# Documentación Técnica del Proyecto: Telos
 
-Este documento proporciona una visión general completa de la arquitectura, tecnologías y estructura del proyecto **Finance Tracker**. Diseñado como una referencia técnica para futuro desarrollo y mantenimiento.
+Este documento proporciona una visión general completa de la arquitectura, tecnologías y estructura del proyecto ****. Diseñado como una referencia técnica para futuro desarrollo y mantenimiento.
 
 ## 1. Visión General
 El proyecto es una aplicación web de gestión personal que integra múltiples módulos:
@@ -58,7 +58,7 @@ graph TD
 ## 4. Estructura del Proyecto
 
 ```text
-finance-tracker/
+telos/
 ├── package.json          # Configuración raíz y scripts globales
 ├── backend/              # Lógica del Servidor
 │   ├── data/             # "Base de Datos" (Archivos JSON)

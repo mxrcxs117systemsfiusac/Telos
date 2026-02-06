@@ -3,6 +3,8 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { sequelize } from '../models/index.js';
+import authRoutes from '../routes/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +17,9 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increased limit for large uploads (PDFs, JSONs)
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Auth Routes
+app.use('/api/auth', authRoutes);
 
 // Path to data file
 // Path to data file
@@ -107,22 +112,37 @@ const programmingHandler = createHandler('programming.json', 'programming');
 
 // Routes
 // Finance
-app.get('/api/data', financeHandler.get);
-app.post('/api/data', financeHandler.post); // Keep legacy endpoint for compatibility if needed, or update hook
-app.get('/api/finance', financeHandler.get);
-app.post('/api/finance', financeHandler.post);
+import financeRoutes from '../routes/finance.js';
 
-// Schedule
-app.get('/api/schedule', scheduleHandler.get);
-app.post('/api/schedule', scheduleHandler.post);
+// ...
+// Routes
+// Finance (New DB Route)
+app.use('/api/finance', financeRoutes);
+// app.get('/api/data', financeHandler.get); // Keep legacy /data for backup or remove
+// app.post('/api/finance', financeHandler.post); // Removed legacy
 
+import scheduleRoutes from '../routes/schedule.js';
+
+// ...
+app.use('/api/schedule', scheduleRoutes);
+// app.get('/api/schedule', scheduleHandler.get); // Legacy
+// app.post('/api/schedule', scheduleHandler.post); // Legacy
+
+import studyRoutes from '../routes/study.js';
+
+// ...
 // Study
-app.get('/api/study', studyHandler.get);
-app.post('/api/study', studyHandler.post);
+app.use('/api/study', studyRoutes);
+// app.get('/api/study', studyHandler.get);
+// app.post('/api/study', studyHandler.post);
 
 // Devotional
-app.get('/api/devotional', devotionalHandler.get);
-app.post('/api/devotional', devotionalHandler.post);
+import devotionalRoutes from '../routes/devotional.js';
+
+// ...
+app.use('/api/devotional', devotionalRoutes);
+// app.get('/api/devotional', devotionalHandler.get);
+// app.post('/api/devotional', devotionalHandler.post);
 
 // Programming
 app.get('/api/programming', programmingHandler.get);
@@ -209,6 +229,12 @@ app.delete('/api/settings/images/:name', (req, res) => {
 // Routes
 
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+// Start Server
+sequelize.sync({ alter: true }).then(() => {
+    console.log('Database synced');
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}).catch(err => {
+    console.error('Failed to sync database:', err);
 });

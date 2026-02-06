@@ -11,16 +11,21 @@
     "preview": "cd frontend && vite preview"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.4",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-circular-progressbar": "^2.2.0",
     "react-dom": "^19.2.0",
     "react-pdf": "^10.3.0",
     "react-router-dom": "^7.13.0",
-    "recharts": "^3.6.0"
+    "recharts": "^3.6.0",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
