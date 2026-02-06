@@ -1,0 +1,491 @@
+{
+  "ingresos": [
+    {
+      "id": 1769234275882,
+      "descripcion": "Sueldo ",
+      "monto": 1270,
+      "fecha": "2026-01-24",
+      "categoria": "Salario"
+    },
+    {
+      "id": 1769292050477,
+      "descripcion": "Sueldo",
+      "monto": 1150,
+      "fecha": "2026-01-24",
+      "categoria": "Salario",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769356948407,
+      "descripcion": "Sueldo",
+      "monto": 50,
+      "fecha": "2026-01-25",
+      "categoria": "Salario",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769643543732,
+      "descripcion": "resto",
+      "monto": 3.04,
+      "fecha": "2026-01-28",
+      "categoria": "Salario",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769907872716,
+      "descripcion": "Sueldo",
+      "monto": 650,
+      "fecha": "2026-02-01",
+      "categoria": "Salario",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770166153733,
+      "descripcion": "Universidad Primer Semana (Planificado)",
+      "monto": 50,
+      "fecha": "2026-02-02",
+      "categoria": "Ingreso Planificado"
+    }
+  ],
+  "egresos": [
+    {
+      "id": 1769400430329,
+      "descripcion": "Socio Honorario (Pago Fijo)",
+      "monto": 50,
+      "fecha": "2026-01-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769400452528,
+      "descripcion": "Tita",
+      "monto": 52,
+      "fecha": "2026-01-26",
+      "categoria": "Comida",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769400468718,
+      "descripcion": "Diezmo",
+      "monto": 60,
+      "fecha": "2026-01-26",
+      "categoria": "Otros",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769643563245,
+      "descripcion": "Tarjeta debito",
+      "monto": 11.04,
+      "fecha": "2026-01-28",
+      "categoria": "Transporte",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769814484039,
+      "descripcion": "Libros Setegua (Pago Fijo)",
+      "monto": 440,
+      "fecha": "2026-01-31",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769907884498,
+      "descripcion": "Diezmo",
+      "monto": 65,
+      "fecha": "2026-02-01",
+      "categoria": "Servicios",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769907896709,
+      "descripcion": "ofrenda",
+      "monto": 10,
+      "fecha": "2026-02-01",
+      "categoria": "Otros",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769907911720,
+      "descripcion": "Cafetería iglesia",
+      "monto": 55,
+      "fecha": "2026-02-01",
+      "categoria": "Comida",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770165891764,
+      "descripcion": "Verdes",
+      "monto": 200,
+      "fecha": "2026-02-04",
+      "categoria": "Otros",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770165906700,
+      "descripcion": "Rosy",
+      "monto": 50,
+      "fecha": "2026-02-04",
+      "categoria": "Casa",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770166066709,
+      "descripcion": "Otros",
+      "monto": 41,
+      "fecha": "2026-02-04",
+      "categoria": "Diversión",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1770166153734,
+      "descripcion": "Gasto de Universidad Primer Semana",
+      "monto": 20,
+      "fecha": "2026-02-02",
+      "categoria": "Gasto Planificado"
+    }
+  ],
+  "pagos": [
+    {
+      "id": 1769234366113,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-01-26",
+      "categoria": "Servicios",
+      "isPaid": true,
+      "relatedIds": [
+        1769400430329
+      ]
+    },
+    {
+      "id": 1769234385622,
+      "descripcion": "Setegua Febrero",
+      "monto": 275,
+      "fecha": "2026-02-14",
+      "categoria": "Educación",
+      "isPaid": false,
+      "relatedIds": []
+    },
+    {
+      "id": 1769234433739,
+      "descripcion": "Setegua Marzo",
+      "monto": 275,
+      "fecha": "2026-03-14",
+      "categoria": "Educación",
+      "isPaid": false,
+      "relatedIds": []
+    },
+    {
+      "id": 1769234456104,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-02-26",
+      "categoria": "Servicios",
+      "isPaid": false,
+      "relatedIds": []
+    },
+    {
+      "id": 1769234479828,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-03-26",
+      "categoria": "Servicios",
+      "isPaid": false,
+      "relatedIds": []
+    },
+    {
+      "id": 1769234504493,
+      "descripcion": "Socio Honorario ",
+      "monto": 50,
+      "fecha": "2026-04-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234525858,
+      "descripcion": "Setegua Abril",
+      "monto": 275,
+      "fecha": "2026-04-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234584893,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-05-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234611526,
+      "descripcion": "Setegua Mayo",
+      "monto": 275,
+      "fecha": "2026-05-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234641592,
+      "descripcion": "Setegua Junio",
+      "monto": 275,
+      "fecha": "2026-06-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234663044,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-06-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234696394,
+      "descripcion": "Setegua Julio",
+      "monto": 275,
+      "fecha": "2026-07-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234718076,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-07-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234757111,
+      "descripcion": "Setegua Agosto",
+      "monto": 275,
+      "fecha": "2026-08-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234778953,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-08-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234818836,
+      "descripcion": "Setegua Septiembre",
+      "monto": 275,
+      "fecha": "2026-09-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234844981,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-09-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234873873,
+      "descripcion": "Setegua Octubre",
+      "monto": 275,
+      "fecha": "2026-10-14",
+      "categoria": "Educación"
+    },
+    {
+      "id": 1769234896267,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-10-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234921750,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-11-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769234939516,
+      "descripcion": "Socio Honorario",
+      "monto": 50,
+      "fecha": "2026-12-26",
+      "categoria": "Servicios"
+    },
+    {
+      "id": 1769238867536,
+      "descripcion": "Curso Vacaciones Junio",
+      "monto": 400,
+      "fecha": "2026-05-25",
+      "categoria": "Educación",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769238891416,
+      "descripcion": "Curso Vacaciones Diciembre",
+      "monto": 400,
+      "fecha": "2026-11-23",
+      "categoria": "Educación",
+      "isPaid": false,
+      "gastoEstimado": 0,
+      "isReceived": false
+    },
+    {
+      "id": 1769239283537,
+      "descripcion": "Libros Setegua",
+      "monto": 440,
+      "fecha": "2026-01-31",
+      "categoria": "Educación",
+      "isPaid": true,
+      "gastoEstimado": 0,
+      "isReceived": false,
+      "relatedIds": [
+        1769814484039
+      ]
+    }
+  ],
+  "metaAhorro": 12500,
+  "ahorroActual": 7000,
+  "plannedIncomes": [
+    {
+      "id": 1770166150745,
+      "descripcion": "Universidad Primer Semana",
+      "monto": 50,
+      "gastoEstimado": 20,
+      "fecha": "2026-02-02",
+      "categoria": "Planificado",
+      "isReceived": true,
+      "relatedIds": [
+        1770166153733,
+        1770166153734
+      ]
+    },
+    {
+      "id": 1769237935207,
+      "descripcion": "Universidad Marzo",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-03-28",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769237973727,
+      "descripcion": "Universidad Abril",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-04-25",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238727857,
+      "descripcion": "Sueldo Esperado de vacaciones Mayo - Junio",
+      "monto": 1000,
+      "gastoEstimado": 700,
+      "fecha": "2026-05-17",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238018676,
+      "descripcion": "Universidad Mayo",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-05-30",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238041453,
+      "descripcion": "Universidad Junio",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-06-27",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238066928,
+      "descripcion": "Universidad Julio",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-07-25",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238085704,
+      "descripcion": "Universidad Agosto",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-08-29",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238106261,
+      "descripcion": "Universidad Septiembre",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-09-26",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238127975,
+      "descripcion": "Universidad Octubre",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-10-31",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769281165219,
+      "descripcion": "Sueldo esperado Noviembre",
+      "monto": 1000,
+      "gastoEstimado": 200,
+      "fecha": "2026-11-23",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238148697,
+      "descripcion": "Universidad Noviembre",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-11-28",
+      "categoria": "Planificado",
+      "isReceived": false
+    },
+    {
+      "id": 1769238166410,
+      "descripcion": "Universidad Diciembre",
+      "monto": 400,
+      "gastoEstimado": 200,
+      "fecha": "2026-12-27",
+      "categoria": "Planificado",
+      "isReceived": false
+    }
+  ],
+  "savingsImage": "/images/WhatsApp_Image_2026-01-30_at_8.26.29_PM__2_.jpeg"
+}

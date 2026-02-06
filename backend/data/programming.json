@@ -1,0 +1,118 @@
+{
+  "checklist": [
+    {
+      "id": "html",
+      "label": "HTML5 Semantic",
+      "category": "Frontend",
+      "completed": false
+    },
+    {
+      "id": "css",
+      "label": "CSS3 + Flexbox/Grid",
+      "category": "Frontend",
+      "completed": false
+    },
+    {
+      "id": "js",
+      "label": "JavaScript ES6+",
+      "category": "Lenguajes",
+      "completed": false
+    },
+    {
+      "id": "ts",
+      "label": "TypeScript",
+      "category": "Lenguajes",
+      "completed": false
+    },
+    {
+      "id": "react",
+      "label": "React + Hooks",
+      "category": "Frontend",
+      "completed": false
+    },
+    {
+      "id": "node",
+      "label": "Node.js",
+      "category": "Backend",
+      "completed": false
+    }
+  ],
+  "sections": [
+    {
+      "id": 1,
+      "title": "General",
+      "items": [
+        {
+          "id": 1769488761542,
+          "text": "Conseguir Novia",
+          "type": "goal",
+          "completed": false,
+          "startDate": "2026-01-27",
+          "endDate": "2027-01-27",
+          "dailyLogs": {
+            "2026-01-27": {
+              "completed": false,
+              "learned": "no le hablé a nadie hoy",
+              "notes": "",
+              "status": "not_progressed"
+            },
+            "2026-01-28": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "nop no le hablé a nadie hoy",
+              "notes": ""
+            },
+            "2026-01-29": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco le hable a nadie",
+              "notes": ""
+            },
+            "2026-01-30": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "nop no le hablé a nadie",
+              "notes": ""
+            },
+            "2026-01-31": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "tampoco le hablé a nadie hoy :(",
+              "notes": ""
+            },
+            "2026-02-01": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco hubo progresó",
+              "notes": ""
+            },
+            "2026-02-02": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "no le hablé a ninguna hoy",
+              "notes": ""
+            },
+            "2026-02-03": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco le hablé a ninguna",
+              "notes": ""
+            },
+            "2026-02-04": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "hoy tampoco le hablé a nadie",
+              "notes": ""
+            },
+            "2026-02-05": {
+              "completed": false,
+              "status": "not_progressed",
+              "learned": "tampoco le hablé a ninguna",
+              "notes": ""
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
