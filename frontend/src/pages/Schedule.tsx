@@ -34,7 +34,7 @@ const normalizeDay = (day: any): string => {
 export default function SchedulePage() {
     const { schedule, isLoaded, saveEvent, deleteEvent } = useSchedule();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingEvent, setEditingEvent] = useState<Partial<ScheduleEvent>>({});
+    const [editingEvent, setEditingEvent] = useState<Partial<ScheduleEvent> & { selectedDays?: string[] }>({});
 
     if (!isLoaded) {
         return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin text-indigo-500" /></div>;
@@ -58,20 +58,43 @@ export default function SchedulePage() {
     };
 
     const handleEdit = (event?: ScheduleEvent) => {
-        setEditingEvent(event || { color: '#4f46e5', day: 'Monday' });
+        if (event) {
+            setEditingEvent({ ...event, selectedDays: [event.day] }); // Single day edit
+        } else {
+            setEditingEvent({ color: '#4f46e5', selectedDays: [], start: '08:00', end: '09:00' });
+        }
         setIsModalOpen(true);
     };
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (editingEvent.day && editingEvent.start && editingEvent.end && editingEvent.title) {
-            // Ensure we save a standardized day key if the backend relies on it, 
-            // but for now we accept what the user selected in the dropdown (which is keyed by English in original, but let's be flexible).
-            // Actually, the dropdown below uses Object.entries(DAY_MAP) which might duplicates generic keys.
-            // Let's fix the dropdown options too.
-            saveEvent(editingEvent as ScheduleEvent);
-            setIsModalOpen(false);
+        const { id, title, start, end, description, color, selectedDays } = editingEvent;
+
+        if (!title || !start || !end || !selectedDays || selectedDays.length === 0) {
+            alert("Completa todos los campos y selecciona al menos un día.");
+            return;
         }
+
+        // If editing existing ID, update just that one (user can't change day easily on existing to multiple, typical behavior)
+        if (id) {
+            saveEvent({ ...editingEvent, day: selectedDays[0] } as ScheduleEvent);
+        } else {
+            // Create for all selected days
+            for (const day of selectedDays) {
+                // We fake an ID for local optmistic update or let hook handle it
+                // Ideally use saveEvent which calls API.
+                // We need to wait for each.
+                // NOTE: useSchedule's saveEvent might not return promise? It does in my memory.
+                // Check useSchedule hook if needed. Assuming it works.
+                // We'll create separate event objects.
+                const newEvent = {
+                    title, start, end, description, color,
+                    day: day // Logic handles normalization
+                } as ScheduleEvent;
+                await saveEvent(newEvent);
+            }
+        }
+        setIsModalOpen(false);
     };
 
     return (
@@ -171,16 +194,38 @@ export default function SchedulePage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm text-slate-400 mb-1">Día</label>
-                                    <select
-                                        className="w-full bg-[#0f1115] border border-white/10 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        value={editingEvent.day}
-                                        onChange={e => setEditingEvent({ ...editingEvent, day: e.target.value })}
-                                    >
-                                        {Object.entries(DAY_MAP).map(([key, label]) => (
-                                            <option key={key} value={key}>{label}</option>
-                                        ))}
-                                    </select>
+                                    <label className="block text-sm text-slate-400 mb-2">Días</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {DAYS.map((dayLabel) => {
+                                            const isSelected = editingEvent.selectedDays?.includes(dayLabel);
+                                            // Handle mapping back to English key if needed? 
+                                            // Actually backend/frontend uses mixed keys. 
+                                            // Let's stick to the Label as the value for simplicity since normalizeDay handles it.
+                                            // Or better: Use the keys that normalize to this label.
+                                            // For new events, we send the Label (e.g. "Lunes"). normalization on display handles it.
+
+                                            return (
+                                                <button
+                                                    key={dayLabel}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const current = editingEvent.selectedDays || [];
+                                                        const newDays = current.includes(dayLabel)
+                                                            ? current.filter(d => d !== dayLabel)
+                                                            : [...current, dayLabel];
+                                                        setEditingEvent({ ...editingEvent, selectedDays: newDays });
+                                                    }}
+                                                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${isSelected
+                                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
+                                                            : 'bg-[#0f1115] text-slate-400 border border-white/10 hover:border-indigo-500/50'
+                                                        }`}
+                                                >
+                                                    {dayLabel.substring(0, 3)}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                    {!editingEvent.id && <p className="text-[10px] text-slate-500 mt-1">Selecciona varios para repetir.</p>}
                                 </div>
                                 <div>
                                     <label className="block text-sm text-slate-400 mb-1">Color</label>

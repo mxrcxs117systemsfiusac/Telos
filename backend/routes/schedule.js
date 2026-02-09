@@ -8,7 +8,18 @@ const router = express.Router();
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const events = await ScheduleEvent.findAll({ where: { user_id: req.user.id } });
-        res.json({ events }); // Return wrapped object to match expected structure if needed, or just list
+        // Map native DB fields to Frontend expected fields
+        const safeEvents = events.map(e => ({
+            id: e.id,
+            title: e.title,
+            day: e.day,
+            start: e.start_time, // Standardize to 'start' for UI
+            end: e.end_time,     // Standardize to 'end' for UI
+            description: e.description,
+            color: e.color,
+            category: e.category
+        }));
+        res.json({ events: safeEvents });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -47,9 +58,9 @@ router.post('/', authenticateToken, async (req, res) => {
         const newEvent = await ScheduleEvent.create({
             user_id: req.user.id,
             title,
-            day: day, // Need to add 'day' to model
-            start_time: start, // Rename 'start' to 'start_time' and change type to string
-            end_time: end,   // Rename 'end' to 'end_time' and change type to string
+            day,
+            start_time: start,
+            end_time: end,
             description,
             color
         });

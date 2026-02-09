@@ -66,9 +66,12 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 // Update Item
 router.put('/:id', authenticateToken, async (req, res) => {
     try {
-        const { type, amount, category, date, description, is_recurring } = req.body;
+        const { type, amount, category, date, description, is_recurring, isPaid, isReceived } = req.body;
+        // Map isPaid/isReceived to is_paid
+        const finalIsPaid = (isPaid !== undefined) ? isPaid : (isReceived !== undefined ? isReceived : false);
+
         const [updated] = await FinanceItem.update({
-            type, amount, category, date, description, is_recurring
+            type, amount, category, date, description, is_recurring, is_paid: finalIsPaid
         }, { where: { id: req.params.id, user_id: req.user.id } });
 
         if (updated) res.json({ success: true });

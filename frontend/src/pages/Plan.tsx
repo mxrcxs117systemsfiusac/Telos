@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Code, CheckSquare, Plus, Trash2, FolderPlus, X, Save, FileText } from 'lucide-react';
-
+import { api } from '../utils/api';
 
 interface DailyLog {
     completed: boolean;
@@ -47,8 +47,7 @@ export default function PlanPage() {
     const [logModal, setLogModal] = useState<LogModalData | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/programming')
-            .then(res => res.json())
+        api.get('/programming')
             .then(data => {
                 if (data.sections) {
                     setSections(data.sections);
@@ -63,11 +62,11 @@ export default function PlanPage() {
 
     const saveSections = async (updatedSections: Section[]) => {
         setSections(updatedSections);
-        await fetch('http://localhost:3001/api/programming', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sections: updatedSections })
-        });
+        try {
+            await api.post('/programming', { sections: updatedSections });
+        } catch (err) {
+            console.error("Failed to save sections", err);
+        }
     };
 
     const addSection = () => {

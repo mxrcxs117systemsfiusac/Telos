@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Upload, Image, FileText, Database, Check, Trash2, User } from 'lucide-react';
-import { Settings } from 'lucide-react';
+import { Upload, Image, FileText, Database, Check, Trash2, User, Settings } from 'lucide-react';
+import { api } from '../utils/api';
+
+const FILE_BASE_URL = 'http://localhost:3001';
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState('profile');
@@ -19,30 +21,17 @@ export default function SettingsPage() {
         }
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:3001/api/auth/update-profile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    username: username || undefined,
-                    password: password || undefined
-                })
+            const data = await api.post('/auth/update-profile', {
+                username: username || undefined,
+                password: password || undefined
             });
-            const data = await res.json();
 
-            if (res.ok) {
-                if (data.token) localStorage.setItem('token', data.token);
-                showStatus('Perfil actualizado correctamente');
-                setPassword('');
-                setConfirmPassword('');
-            } else {
-                showStatus(data.error || 'Error al actualizar', true);
-            }
-        } catch (err) {
-            showStatus('Error de conexión', true);
+            if (data.token) localStorage.setItem('token', data.token);
+            showStatus('Perfil actualizado correctamente');
+            setPassword('');
+            setConfirmPassword('');
+        } catch (err: any) {
+            showStatus(err.message || 'Error al actualizar', true);
         }
     };
 
@@ -56,19 +45,17 @@ export default function SettingsPage() {
 
     useEffect(() => {
         // Check status on load
-        fetch('http://localhost:3001/api/devotional').then(res => res.json()).then(data => {
+        api.get('/devotional').then(data => {
             if (data.entries?.length > 0 || data.versiculos?.length > 0) setHasVerses(true);
         }).catch(() => { });
 
-        fetch('http://localhost:3001/api/finance').then(res => res.json()).then(data => {
+        api.get('/finance').then(data => {
             if (data.savingsImage) setSavingsImage(data.savingsImage);
         }).catch(() => { });
 
-        fetch('http://localhost:3001/api/schedule').then(res => res.json()).then(data => {
-            // Schedule check removed
-        }).catch(() => { });
+        // Schedule check removed
 
-        fetch('http://localhost:3001/api/study/pdfs').then(res => res.json()).then(data => {
+        api.get('/study/pdfs').then(data => {
             if (Array.isArray(data)) setPdfs(data);
         }).catch(() => { });
     }, [activeTab]);
@@ -84,22 +71,17 @@ export default function SettingsPage() {
     const handleReset = async (type: 'schedule' | 'verses') => {
         if (!confirm('¿Estás seguro de eliminar estos datos?')) return;
 
-        if (type === 'verses') {
-            await fetch('http://localhost:3001/api/devotional', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ entries: [] })
-            });
-            setHasVerses(false);
-            showStatus('Versículos eliminados');
-        } else {
-            await fetch('http://localhost:3001/api/schedule', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ config: { startHour: 7, endHour: 21 }, events: [] })
-            });
-            // Schedule reset
-            showStatus('Horario reiniciado');
+        try {
+            if (type === 'verses') {
+                await api.post('/devotional', { entries: [] });
+                setHasVerses(false);
+                showStatus('Versículos eliminados');
+            } else {
+                await api.post('/schedule', { config: { startHour: 7, endHour: 21 }, events: [] });
+                showStatus('Horario reiniciado');
+            }
+        } catch (err) {
+            showStatus('Error al reiniciar', true);
         }
     };
 
@@ -122,33 +104,17 @@ export default function SettingsPage() {
                 .replace(/[^a-zA-Z0-9.-]/g, '_'); // Replace special chars with _
 
             try {
-                const res = await fetch('http://localhost:3001/api/settings/upload-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: safeName, data: base64 })
-                });
+                const json = await api.post('/settings/upload-image', { name: safeName, data: base64 });
 
-                if (res.ok) {
-                    const json = await res.json();
+                // Update finance data "savingsImage"
+                const finData = await api.get('/finance');
+                await api.post('/finance', { ...finData, savingsImage: json.url });
 
-                    // Update finance data "savingsImage"
-                    const finRes = await fetch('http://localhost:3001/api/finance');
-                    const finData = await finRes.json();
-                    await fetch('http://localhost:3001/api/finance', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ...finData, savingsImage: json.url })
-                    });
+                setSavingsImage(json.url);
+                showStatus('Imagen de Billetera actualizada');
 
-                    setSavingsImage(json.url);
-                    showStatus('Imagen de Billetera actualizada');
-
-                } else {
-                    const err = await res.json();
-                    showStatus(`Error: ${err.error || 'Fallo la carga'}`, true);
-                }
-            } catch (err) {
-                showStatus('Error de red al intentar subir imagen', true);
+            } catch (err: any) {
+                showStatus(`Error: ${err.message || 'Fallo la carga'}`, true);
             } finally {
                 setUploadingImg(false);
             }
@@ -168,18 +134,17 @@ export default function SettingsPage() {
         const reader = new FileReader();
         reader.onload = async () => {
             const base64 = reader.result as string;
-            await fetch('http://localhost:3001/api/study/upload-pdf', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: file.name, data: base64 })
-            });
+            try {
+                await api.post('/study/upload-pdf', { name: file.name, data: base64 });
 
-            // Refresh list
-            const resLists = await fetch('http://localhost:3001/api/study/pdfs');
-            const dataLists = await resLists.json();
-            setPdfs(dataLists);
+                // Refresh list
+                const dataLists = await api.get('/study/pdfs');
+                setPdfs(dataLists);
 
-            showStatus('PDF subido a la biblioteca');
+                showStatus('PDF subido a la biblioteca');
+            } catch (err) {
+                showStatus('Error al subir PDF', true);
+            }
         };
         reader.readAsDataURL(file);
     };
@@ -188,21 +153,16 @@ export default function SettingsPage() {
         if (!confirm('¿Estás seguro de eliminar la imagen de la meta de ahorro?')) return;
 
         try {
-            const finRes = await fetch('http://localhost:3001/api/finance');
-            const finData = await finRes.json();
+            const finData = await api.get('/finance');
 
             // Remove from finance data
-            await fetch('http://localhost:3001/api/finance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...finData, savingsImage: null })
-            });
+            await api.post('/finance', { ...finData, savingsImage: null });
 
             // Optional: Delete physical file if needed, but for now just unset reference
             if (savingsImage) {
                 const name = savingsImage.split('/').pop();
                 if (name) {
-                    await fetch(`http://localhost:3001/api/settings/images/${name}`, { method: 'DELETE' });
+                    await api.delete(`/settings/images/${name}`);
                 }
             }
 
@@ -217,7 +177,7 @@ export default function SettingsPage() {
         if (!confirm(`¿Estás seguro de eliminar el PDF "${name}"?`)) return;
 
         try {
-            await fetch(`http://localhost:3001/api/study/pdfs/${name}`, { method: 'DELETE' });
+            await api.delete(`/study/pdfs/${name}`);
             setPdfs(pdfs.filter(p => p.name !== name));
             showStatus('PDF eliminado');
         } catch (err) {
@@ -247,7 +207,7 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</div>
                     </button>
                     <button onClick={() => setActiveTab('data')} className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'data' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>
-                        <div className="flex items-center gap-2"><Database className="w-4 h-4" /> Datos JSON</div>
+                        <div className="flex items-center gap-2"><Database className="w-4 h-4" /> Datos</div>
                     </button>
                     <button onClick={() => setActiveTab('resources')} className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'resources' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>
                         <div className="flex items-center gap-2"><Image className="w-4 h-4" /> Recursos Visuales</div>
@@ -264,7 +224,7 @@ export default function SettingsPage() {
                             </h3>
                             <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-md">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nuevo Usuario (Opcional)</label>
+                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nuevo Usuario</label>
                                     <input
                                         type="text"
                                         value={username}
@@ -274,7 +234,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nueva Contraseña (Opcional)</label>
+                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nueva Contraseña</label>
                                     <input
                                         type="password"
                                         value={password}
@@ -317,18 +277,10 @@ export default function SettingsPage() {
                                     if (!text || !citation) return;
 
                                     try {
-                                        const res = await fetch('http://localhost:3001/api/devotional', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                                            body: JSON.stringify({ text, citation })
-                                        });
-                                        if (res.ok) {
-                                            showStatus('Versículo agregado correctamente');
-                                            form.reset();
-                                            setHasVerses(true);
-                                        } else {
-                                            showStatus('Error al agregar', true);
-                                        }
+                                        await api.post('/devotional', { text, citation });
+                                        showStatus('Versículo agregado correctamente');
+                                        form.reset();
+                                        setHasVerses(true);
                                     } catch (err) { showStatus('Error de conexión', true); }
                                 }} className="space-y-4">
                                     <div>
@@ -343,6 +295,12 @@ export default function SettingsPage() {
                                         Guardar Versículo
                                     </button>
                                 </form>
+
+                                {/* Verse List */}
+                                <div className="mt-6 border-t border-white/10 pt-4">
+                                    <h4 className="text-sm font-bold text-slate-400 mb-3 uppercase">Versículos Guardados</h4>
+                                    <VerseList hasVerses={hasVerses} setHasVerses={setHasVerses} showStatus={showStatus} />
+                                </div>
                             </div>
 
                             {/* Reset Zone */}
@@ -370,7 +328,7 @@ export default function SettingsPage() {
                                     <div className="flex flex-col items-center gap-2 text-slate-400">
                                         {savingsImage ? (
                                             <div className="relative">
-                                                <img src={`http://localhost:3001${savingsImage}`} alt="Current" className="h-32 object-contain rounded-lg border border-white/10" />
+                                                <img src={`${FILE_BASE_URL}${savingsImage}`} alt="Current" className="h-32 object-contain rounded-lg border border-white/10" />
                                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                                                     <p className="text-white text-sm font-bold">Click para cambiar</p>
                                                 </div>
@@ -427,6 +385,52 @@ export default function SettingsPage() {
 
                 </div>
             </div>
+        </div>
+    );
+}
+
+function VerseList({ hasVerses, setHasVerses, showStatus }: { hasVerses: boolean, setHasVerses: (v: boolean) => void, showStatus: (msg: string, err?: boolean) => void }) {
+    const [verses, setVerses] = useState<any[]>([]);
+
+    const fetchVerses = () => {
+        api.get('/devotional')
+            .then(data => {
+                if (data.entries) {
+                    setVerses(data.entries);
+                    setHasVerses(data.entries.length > 0);
+                }
+            })
+            .catch(console.error);
+    };
+
+    useEffect(() => {
+        fetchVerses();
+    }, [hasVerses]); // Refresh when hasVerses changes (added/deleted)
+
+    const handleDelete = async (id: number) => {
+        if (!confirm('Eliminar este versículo?')) return;
+        try {
+            await api.delete(`/devotional/${id}`);
+            showStatus('Versículo eliminado');
+            fetchVerses();
+        } catch (e) { showStatus('Error de conexión', true); }
+    };
+
+    if (verses.length === 0) return <p className="text-xs text-slate-500 italic">No hay versículos guardados.</p>;
+
+    return (
+        <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+            {verses.map((v: any) => (
+                <div key={v.id} className="bg-black/20 p-3 rounded-lg border border-white/5 flex justify-between items-start group">
+                    <div>
+                        <p className="text-xs font-bold text-purple-400 mb-1">{v.citation}</p>
+                        <p className="text-xs text-slate-300 line-clamp-2">{v.text}</p>
+                    </div>
+                    <button onClick={() => handleDelete(v.id)} className="text-slate-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            ))}
         </div>
     );
 }

@@ -67,12 +67,12 @@ router.post('/', async (req, res) => {
                 newGoals.push({
                     user_id: req.user.id,
                     title: item.text,
-                    description: '', // Frontend doesn't send description yet for these
+                    description: '',
                     category: section.title,
-                    start_date: item.startDate || null,
-                    end_date: item.endDate || null,
+                    startDate: item.startDate || null,
+                    endDate: item.endDate || null,
                     status: item.completed ? 'completed' : 'active',
-                    logs: JSON.stringify(item.dailyLogs || {})
+                    logs: item.dailyLogs || {}
                 });
             }
         }

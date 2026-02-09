@@ -7,6 +7,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../utils/api';
 
 // Worker configuration
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -32,8 +33,6 @@ interface Resource {
     url: string;
     progress: number;
 }
-
-const API_URL = 'http://localhost:3001/api/study';
 
 export default function StudyPage() {
     const { token } = useAuth();
@@ -69,8 +68,7 @@ export default function StudyPage() {
     // Fetch Data
     useEffect(() => {
         if (!token) return;
-        fetch(API_URL, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
+        api.get('/study')
             .then(data => {
                 setTasks(data.tasks || []);
                 setConcepts(data.concepts || []);
@@ -79,11 +77,6 @@ export default function StudyPage() {
             })
             .catch(e => console.error(e));
     }, [token]);
-
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
 
     // --- TASK LOGIC ---
     const getFilteredTasks = () => {
@@ -126,12 +119,11 @@ export default function StudyPage() {
             if (editingId) {
                 // Update
                 setTasks(prev => prev.map(t => t.id === editingId ? { ...t, ...newTask } as Task : t)); // Optimistic
-                await fetch(`${API_URL}/tasks/${editingId}`, { method: 'PUT', headers, body: JSON.stringify(payload) });
+                await api.put(`/study/tasks/${editingId}`, payload);
                 // Ideally refresh
             } else {
                 // Create
-                const res = await fetch(`${API_URL}/tasks`, { method: 'POST', headers, body: JSON.stringify(payload) });
-                const saved = await res.json();
+                const saved = await api.post('/study/tasks', payload);
                 setTasks(prev => [...prev, saved]);
             }
         } catch (e) {
@@ -146,7 +138,7 @@ export default function StudyPage() {
     const handleDeleteTask = async (id: number) => {
         if (!confirm("¿Eliminar tarea?")) return;
         setTasks(prev => prev.filter(t => t.id !== id));
-        await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE', headers });
+        await api.delete(`/study/tasks/${id}`);
     };
 
     const toggleTask = async (id: number) => {
@@ -155,19 +147,14 @@ export default function StudyPage() {
         const newStatus = task.status === 'completed' ? 'pending' : 'completed';
 
         setTasks(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
-        await fetch(`${API_URL}/tasks/${id}`, {
-            method: 'PUT',
-            headers,
-            body: JSON.stringify({ completed: newStatus === 'completed' })
-        });
+        await api.put(`/study/tasks/${id}`, { completed: newStatus === 'completed' });
     };
 
     // --- CONCEPT LOGIC ---
     const handleAddConcept = async () => {
         if (!newConcept.term || !newConcept.definition) return;
         try {
-            const res = await fetch(`${API_URL}/concepts`, { method: 'POST', headers, body: JSON.stringify(newConcept) });
-            const saved = await res.json();
+            const saved = await api.post('/study/concepts', newConcept);
             setConcepts(prev => [...prev, saved]);
             setShowConceptForm(false);
             setNewConcept({});
@@ -176,7 +163,7 @@ export default function StudyPage() {
 
     const handleDeleteConcept = async (id: number) => {
         setConcepts(prev => prev.filter(c => c.id !== id));
-        await fetch(`${API_URL}/concepts/${id}`, { method: 'DELETE', headers });
+        await api.delete(`/study/concepts/${id}`);
     };
 
     // --- PDF LOGIC ---
@@ -194,11 +181,7 @@ export default function StudyPage() {
             const newPage = Math.min(Math.max(1, prev + offset), numPages || 1);
             if (selectedPdf) {
                 // Save progress
-                fetch(`${API_URL}/pdfs/${selectedPdf.id}`, {
-                    method: 'PUT',
-                    headers,
-                    body: JSON.stringify({ progress: newPage })
-                });
+                api.put(`/study/pdfs/${selectedPdf.id}`, { progress: newPage });
                 // Update local
                 setPdfs(curr => curr.map(p => p.id === selectedPdf.id ? { ...p, progress: newPage } : p));
             }
@@ -265,6 +248,7 @@ export default function StudyPage() {
                                         <button onClick={() => handleDeleteTask(task.id)} className="text-slate-600 hover:text-rose-400 opacity-0 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
                                     </div>
                                     <h4 className={`font-bold text-slate-200 mb-1 ${task.status === 'completed' ? 'line-through' : ''}`}>{task.title}</h4>
+                                    {task.description && <p className="text-sm text-slate-400 mb-2 whitespace-pre-wrap">{task.description}</p>}
                                     <span className="text-xs text-slate-500"><Clock className="w-3 h-3 inline mr-1" />{task.deadline}</span>
                                 </div>
                             ))}

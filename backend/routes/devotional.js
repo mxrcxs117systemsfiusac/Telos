@@ -69,4 +69,21 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Delete entry
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await DevotionalEntry.destroy({
+            where: { id, user_id: req.user.id }
+        });
+        if (deleted) {
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ error: 'Entry not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

@@ -8,6 +8,10 @@ import {
 import { useFinance } from '../hooks/useFinance';
 import { useSchedule } from '../hooks/useSchedule';
 
+import { api } from '../utils/api';
+
+// ... imports
+
 export default function Dashboard() {
     const navigate = useNavigate();
     const { balance, pagos, isLoaded: financeLoaded } = useFinance();
@@ -31,11 +35,10 @@ export default function Dashboard() {
 
             // 1. Fetch Study Tasks
             try {
-                const res = await fetch('http://localhost:3001/api/study');
-                const data = await res.json();
+                const data = await api.get('/study');
                 if (data.tasks) {
                     const studyTasks = data.tasks
-                        .filter((t: any) => !t.completed)
+                        .filter((t: any) => !t.completed && t.status !== 'completed')
                         .map((t: any) => ({ ...t, source: 'study' }));
                     allTasks = [...allTasks, ...studyTasks];
                 }
@@ -43,8 +46,7 @@ export default function Dashboard() {
 
             // 2. Fetch Plan Goals/Habits (Active today)
             try {
-                const res = await fetch('http://localhost:3001/api/programming');
-                const data = await res.json();
+                const data = await api.get('/programming');
                 const today = new Date().toISOString().split('T')[0];
 
                 if (data.sections) {
@@ -83,8 +85,7 @@ export default function Dashboard() {
         fetchTasks();
 
         // Fetch Verse (Devotional) & Setup Rotation
-        fetch('http://localhost:3001/api/devotional')
-            .then(res => res.json())
+        api.get('/devotional')
             .then(data => {
                 const entries = data.entries || data.versiculos || [];
                 if (entries.length > 0) {
@@ -107,11 +108,12 @@ export default function Dashboard() {
                         return () => clearInterval(interval);
                     }
                 } else {
-                    setVerse({ text: "Todo lo puedo en Cristo que me fortalece.", citation: "Filipenses 4:13" });
+                    setVerse({ text: "No hay versículos guardados aún.", citation: "Ve a Ajustes para agregar." });
                 }
             })
-            .catch(() => {
-                setVerse({ text: "Todo lo puedo en Cristo que me fortalece.", citation: "Filipenses 4:13" });
+            .catch((err) => {
+                console.error("Dashboard Verse Error:", err);
+                setVerse({ text: "Error cargando versículos.", citation: "Intenta recargar." });
             });
     }, []);
 
@@ -235,7 +237,7 @@ export default function Dashboard() {
                 </div>
                 <div className="glass-panel p-5 rounded-xl border-l-4 border-purple-500">
                     <h3 className="text-slate-400 text-sm font-medium uppercase">Versículo del Día</h3>
-                    <p className="text-sm italic mt-1">"{verse.text}"</p>
+                    <p className="text-sm italic mt-1 text-slate-200">"{verse.text}"</p>
                     <p className="text-xs text-purple-400 mt-2">{verse.citation}</p>
                 </div>
             </div>

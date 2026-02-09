@@ -10,19 +10,26 @@ const ScheduleEvent = sequelize.define('ScheduleEvent', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    start: {
-        type: DataTypes.DATE,
+    day: {
+        type: DataTypes.STRING, // e.g., 'Lunes', 'Monday'
         allowNull: false
     },
-    end: {
-        type: DataTypes.DATE,
-        allowNull: true
+    start_time: {
+        type: DataTypes.STRING, // '08:00'
+        allowNull: false
     },
-    allDay: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    end_time: {
+        type: DataTypes.STRING, // '09:00'
+        allowNull: false
     },
-    category: { // e.g. 'class', 'exam', 'personal'
+    description: {
+        type: DataTypes.TEXT
+    },
+    color: {
+        type: DataTypes.STRING,
+        defaultValue: '#4f46e5'
+    },
+    category: {
         type: DataTypes.STRING,
         defaultValue: 'general'
     }

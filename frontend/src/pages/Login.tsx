@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, Lock, User } from 'lucide-react';
+import { api } from '../utils/api';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -17,19 +18,11 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            const res = await fetch('http://localhost:3001/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
-
+            const data = await api.post('/auth/login', { username, password });
             login(data.token, data.user);
             navigate('/');
         } catch (err: any) {
-            setError(err.message === 'Invalid credentials' ? 'Credenciales incorrectas' : 'Error de servidor');
+            setError(err.message === 'Invalid credentials' ? 'Credenciales incorrectas' : err.message || 'Error de servidor');
         } finally {
             setIsLoading(false);
         }

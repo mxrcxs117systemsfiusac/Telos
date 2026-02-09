@@ -39,16 +39,11 @@ router.post('/tasks', authenticateToken, async (req, res) => {
         const { text, description, date, startTime, endTime, category } = req.body;
         const newItem = await Task.create({
             user_id: req.user.id,
-            title: text, // Model uses 'title'
-            subject: category, // Model uses 'subject' mapped to category
-            deadline: date,   // Model uses 'deadline' mapped to date
-            status: 'pending' // Default
-            // Need to handle startTime/endTime if I want to persist them separately or in deadline?
-            // My Task model has: title, subject, status, deadline, priority.
-            // It lacks description, startTime, endTime.
-            // I should update Task model or store description in title?
-            // I'll assume I update Task model later or just map what I can.
-            // For now mapping text->title, category->subject.
+            title: text,
+            subject: category,
+            deadline: date,
+            status: 'pending',
+            description: description || '' // Save description
         });
         res.json(newItem);
     } catch (err) {

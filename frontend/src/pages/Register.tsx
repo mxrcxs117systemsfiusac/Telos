@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
+import { api } from '../utils/api';
 
 export default function Register() {
     const [username, setUsername] = useState('');
@@ -11,15 +12,7 @@ export default function Register() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Registration failed');
-
+            await api.post('/auth/register', { username, password });
             navigate('/login');
         } catch (err: any) {
             setError(err.message);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../utils/api';
 
 export interface Transaction {
   id: number;
@@ -12,8 +13,6 @@ export interface Transaction {
   isReceived?: boolean;
   relatedIds?: number[];
 }
-
-const API_URL = 'http://localhost:3001/api/finance';
 
 export const useFinance = () => {
   const { token } = useAuth();
@@ -29,10 +28,7 @@ export const useFinance = () => {
   useEffect(() => {
     if (!token) return;
 
-    fetch(API_URL, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
+    api.get('/finance')
       .then(data => {
         setIngresos(data.ingresos || []);
         setEgresos(data.egresos || []);
@@ -45,11 +41,6 @@ export const useFinance = () => {
       })
       .catch(err => console.error('Error loading finance data', err));
   }, [token]);
-
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  };
 
   const mapTypeToDB = (type: string) => {
     if (type === 'ingreso') return 'income';
@@ -69,18 +60,14 @@ export const useFinance = () => {
     if (type === 'planned') setPlannedIncomes(prev => [...prev, optimisticItem]);
 
     try {
-      const res = await fetch(`${API_URL}/add`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          type: mapTypeToDB(type),
-          amount: item.monto,
-          category: item.categoria,
-          date: item.fecha,
-          description: item.descripcion
-        })
+      const saved = await api.post('/finance/add', {
+        type: mapTypeToDB(type),
+        amount: item.monto,
+        category: item.categoria,
+        date: item.fecha,
+        description: item.descripcion
       });
-      const saved = await res.json();
+
       const updateId = (list: Transaction[]) => list.map(i => i.id === tempId ? { ...i, id: saved.id } : i);
 
       if (type === 'ingreso') setIngresos(updateId);
@@ -100,16 +87,12 @@ export const useFinance = () => {
     if (type === 'planned') setPlannedIncomes(updateList);
 
     try {
-      await fetch(`${API_URL}/${item.id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          type: mapTypeToDB(type),
-          amount: item.monto,
-          category: item.categoria,
-          date: item.fecha,
-          description: item.descripcion
-        })
+      await api.put(`/finance/${item.id}`, {
+        type: mapTypeToDB(type),
+        amount: item.monto,
+        category: item.categoria,
+        date: item.fecha,
+        description: item.descripcion
       });
     } catch (err) {
       console.error('Update failed', err);
@@ -123,7 +106,7 @@ export const useFinance = () => {
     if (type === 'planned') setPlannedIncomes(prev => prev.filter(i => i.id !== id));
 
     try {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers });
+      await api.delete(`/finance/${id}`);
     } catch (err) {
       console.error('Delete failed', err);
     }
@@ -141,13 +124,9 @@ export const useFinance = () => {
 
     // Persist
     try {
-      await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          ...item,
-          isPaid: newStatus
-        })
+      await api.put(`/finance/${id}`, {
+        ...item,
+        isPaid: newStatus
       });
 
       // Trigger logic: If paid, maybe create a real expense?
@@ -181,13 +160,9 @@ export const useFinance = () => {
 
     // Persist
     try {
-      await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          ...item,
-          isReceived: newStatus
-        })
+      await api.put(`/finance/${id}`, {
+        ...item,
+        isReceived: newStatus
       });
 
       if (newStatus) {

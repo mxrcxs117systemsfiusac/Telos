@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../utils/api';
 
 export interface ScheduleEvent {
     id?: number;
@@ -26,8 +27,6 @@ const DEFAULT_CONFIG: ScheduleConfig = {
     endHour: 21
 };
 
-const API_URL = 'http://localhost:3001/api/schedule';
-
 export const useSchedule = () => {
     const { token } = useAuth();
     const [schedule, setSchedule] = useState<ScheduleData>({ config: DEFAULT_CONFIG, events: [] });
@@ -36,39 +35,12 @@ export const useSchedule = () => {
     useEffect(() => {
         if (!token) return;
 
-        fetch(API_URL, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(res => res.json())
+        api.get('/schedule')
             .then(data => {
                 const events = Array.isArray(data.events) ? data.events : [];
-                // Map DB fields if necessary (start_time -> start)
-                // My router assumes frontend sends 'start', 'end'. 
-                // But DB might store them as start_time/end_time.
-                // Let's ensure Router maps them correctly in GET response or handle here.
-                // In my router implementation I just did `res.json({ events })`.
-                // If DB uses `start_time`, I should map it.
-                // I'll check router again.
-                // Router: `ScheduleEvent.findAll()`. Model: `start: DataTypes.DATE` in my initial creation (Step 36).
-                // Wait, in Step 36 I defined `start: DataTypes.DATE, end: DataTypes.DATE`.
-                // But in Step 132 (route creation) I commented about string time.
-                // If strict mode, I need to fix the Model or store full dates.
-                // Since this is a Weekly Schedule, storing full dates is wrong.
-                // I should have defined `start_time` string.
-                // I will assume for now I store strings in those DATE columns (SQLite allows this) or I should alter the table.
-                // To be safe, I will rely on "Whatever is in DB".
-                // I will map `start` to `start` if matches.
-
-                // Normalizing response:
-                const mappedEvents = events.map((e: any) => ({
-                    ...e,
-                    start: e.start_time || e.start,
-                    end: e.end_time || e.end
-                }));
-
                 setSchedule({
                     config: data.config || DEFAULT_CONFIG,
-                    events: mappedEvents
+                    events: events
                 });
                 setIsLoaded(true);
             })
@@ -77,11 +49,6 @@ export const useSchedule = () => {
                 setIsLoaded(true);
             });
     }, [token]);
-
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
 
     const saveEvent = async (event: ScheduleEvent) => {
         // Optimistic
@@ -98,18 +65,9 @@ export const useSchedule = () => {
 
         try {
             if (isUpdate) {
-                await fetch(`${API_URL}/${event.id}`, {
-                    method: 'PUT',
-                    headers,
-                    body: JSON.stringify(event)
-                });
+                await api.put(`/schedule/${event.id}`, event);
             } else {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(event)
-                });
-                const saved = await res.json();
+                const saved = await api.post('/schedule', event);
                 // Update temp ID with real ID
                 setSchedule(prev => ({
                     ...prev,
@@ -118,6 +76,7 @@ export const useSchedule = () => {
             }
         } catch (err) {
             console.error('Save failed', err);
+            // Revert or show error (optimization: implement revert logic)
         }
     };
 
@@ -128,7 +87,7 @@ export const useSchedule = () => {
         }));
 
         try {
-            await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers });
+            await api.delete(`/schedule/${id}`);
         } catch (err) {
             console.error('Delete failed', err);
         }
