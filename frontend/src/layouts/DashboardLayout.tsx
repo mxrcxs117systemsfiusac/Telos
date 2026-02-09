@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard, Wallet, Calendar, Book, Wrench, Bot,
-    Code, Menu, Settings
+    Code, Menu, Settings, LogOut
 } from 'lucide-react';
 
 export default function DashboardLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { logout } = useAuth();
 
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -75,6 +77,13 @@ export default function DashboardLayout() {
                     ))}
 
                     <div className="pt-4 mt-4 border-t border-white/5">
+                        <button
+                            onClick={logout}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            Cerrar Sesión
+                        </button>
                     </div>
                 </nav>
             </aside>

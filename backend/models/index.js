@@ -6,6 +6,7 @@ import Task from './Task.js';
 import DevotionalEntry from './Devotional.js';
 import Resource from './Resource.js';
 import Concept from './Concept.js';
+import Goal from './Goal.js';
 
 // Define Associations
 const models = {
@@ -15,7 +16,8 @@ const models = {
     Task,
     DevotionalEntry,
     Resource,
-    Concept
+    Concept,
+    Goal
 };
 
 // User Associations
@@ -37,5 +39,8 @@ Resource.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Concept, { foreignKey: 'user_id' });
 Concept.belongsTo(User, { foreignKey: 'user_id' });
 
-export { sequelize, User, FinanceItem, ScheduleEvent, Task, DevotionalEntry, Resource, Concept };
+User.hasMany(Goal, { foreignKey: 'user_id' });
+Goal.belongsTo(User, { foreignKey: 'user_id' });
+
+export { sequelize, User, FinanceItem, ScheduleEvent, Task, DevotionalEntry, Resource, Concept, Goal };
 export default models;

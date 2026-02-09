@@ -97,7 +97,7 @@ export default function Dashboard() {
                     setVerse({ text: "Todo lo puedo en Cristo que me fortalece.", citation: "Filipenses 4:13" });
                 }
             })
-            .catch(err => {
+            .catch(() => {
                 setVerse({ text: "Todo lo puedo en Cristo que me fortalece.", citation: "Filipenses 4:13" });
             });
     }, []);
@@ -140,7 +140,7 @@ export default function Dashboard() {
         // Check today first
         const todayKey = dayOrder[currentDayIndex];
         const todayEvents = schedule.events
-            .filter((e: any) => e.day.toLowerCase() === todayKey)
+            .filter((e: any) => e.day && typeof e.day === 'string' && e.day.toLowerCase() === todayKey)
             .sort((a: any, b: any) => parseTime(a.start) - parseTime(b.start));
 
         const nextToday = todayEvents.find((e: any) => parseTime(e.start) > currentTime);
@@ -152,7 +152,7 @@ export default function Dashboard() {
             const nextDayKey = dayOrder[nextDayIndex];
 
             const nextDayEvents = schedule.events
-                .filter((e: any) => e.day.toLowerCase() === nextDayKey)
+                .filter((e: any) => e.day && typeof e.day === 'string' && e.day.toLowerCase() === nextDayKey)
                 .sort((a: any, b: any) => parseTime(a.start) - parseTime(b.start));
 
             if (nextDayEvents.length > 0) {
