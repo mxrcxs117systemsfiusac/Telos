@@ -130,44 +130,72 @@ export const useFinance = () => {
   };
 
   // Re-implement Automation Logic (kept local for now, but could be backend)
-  const togglePaymentStatus = (id: number) => {
-    // For now, simple local toggle + no backend sync implemented for "isPaid" status on the 'payment' itself
-    // Ideally, 'payment' items in DB should have 'is_paid' column.
-    // My FinanceItem model has 'is_recurring', but not 'is_paid'.
-    // I should add 'is_paid' to Finance model? Or just let it be.
-    // For migration speed, I'll update local state.
-    // NOTE: The user logic created REAL expenses when paid. 
-    // I should call addTransaction('egreso', ...) when paid.
-
+  const togglePaymentStatus = async (id: number) => {
     const item = pagos.find(p => p.id === id);
     if (!item) return;
 
-    if (!item.isPaid) {
-      const newItem = {
-        id: 0,
-        descripcion: `${item.descripcion} (Pago Fijo)`,
-        monto: item.monto,
-        fecha: item.fecha,
-        categoria: item.categoria
-      };
-      addTransaction('egreso', newItem);
+    const newStatus = !item.isPaid;
 
-      // Update Payment status locally (in-memory only for now if no DB field)
-      setPagos(prev => prev.map(p => p.id === id ? { ...p, isPaid: true } : p));
-    } else {
-      setPagos(prev => prev.map(p => p.id === id ? { ...p, isPaid: false } : p));
+    // Optimistic Update
+    setPagos(prev => prev.map(p => p.id === id ? { ...p, isPaid: newStatus } : p));
+
+    // Persist
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          ...item,
+          isPaid: newStatus
+        })
+      });
+
+      // Trigger logic: If paid, maybe create a real expense?
+      // For now, let's keep it simple. If user wants a record, they might see it in "Gastos Reales" if we calculated it.
+      // The original logic created a new transaction.
+      if (newStatus) {
+        const newItem = {
+          id: 0,
+          descripcion: `${item.descripcion} (Pago Fijo)`,
+          monto: item.monto,
+          fecha: item.fecha,
+          categoria: item.categoria
+        };
+        addTransaction('egreso', newItem);
+      }
+    } catch (e) {
+      console.error("Failed to toggle payment status", e);
+      // Revert
+      setPagos(prev => prev.map(p => p.id === id ? { ...p, isPaid: !newStatus } : p));
     }
   };
 
-  const toggleReceivedStatus = (id: number) => {
-    // Similar logic
+  const toggleReceivedStatus = async (id: number) => {
     const item = plannedIncomes.find(p => p.id === id);
     if (!item) return;
-    if (!item.isReceived) {
-      addTransaction('ingreso', { ...item, descripcion: `${item.descripcion} (Planificado)` });
-      setPlannedIncomes(prev => prev.map(p => p.id === id ? { ...p, isReceived: true } : p));
-    } else {
-      setPlannedIncomes(prev => prev.map(p => p.id === id ? { ...p, isReceived: false } : p));
+
+    const newStatus = !item.isReceived;
+
+    // Optimistic
+    setPlannedIncomes(prev => prev.map(p => p.id === id ? { ...p, isReceived: newStatus } : p));
+
+    // Persist
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          ...item,
+          isReceived: newStatus
+        })
+      });
+
+      if (newStatus) {
+        addTransaction('ingreso', { ...item, descripcion: `${item.descripcion} (Planificado)` });
+      }
+    } catch (e) {
+      console.error("Failed to toggle received status", e);
+      setPlannedIncomes(prev => prev.map(p => p.id === id ? { ...p, isReceived: !newStatus } : p));
     }
   };
 

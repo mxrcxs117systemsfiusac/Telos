@@ -58,4 +58,33 @@ router.get('/me', (req, res) => {
     }
 });
 
+// Update Profile
+router.post('/update-profile', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) return res.status(401).json({ error: 'No token' });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+
+        const { username, password } = req.body;
+        const user = await User.findByPk(decoded.id);
+
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        if (username) user.username = username;
+        if (password) {
+            user.password_hash = await bcrypt.hash(password, 10);
+        }
+
+        await user.save();
+
+        // Generate new token if username changed (optional but good practice)
+        const newToken = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '7d' });
+
+        res.json({ success: true, token: newToken, user: { id: user.id, username: user.username } });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

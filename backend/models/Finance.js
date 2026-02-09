@@ -28,6 +28,10 @@ const FinanceItem = sequelize.define('FinanceItem', {
     is_recurring: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    is_paid: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 });
 

@@ -11,13 +11,23 @@ router.get('/', authenticateToken, async (req, res) => {
 
         // Transform to legacy format
         const data = {
-            ingresos: items.filter(i => i.type === 'income').map(i => i.toJSON()),
-            egresos: items.filter(i => i.type === 'expense').map(i => i.toJSON()),
-            pagos: [], // Recurring payments logic to be added
-            metaAhorro: 0, // Need a Settings table for this or generic key-value
+            ingresos: items.filter(i => i.type === 'income').map(i => ({ ...i.toJSON(), monto: i.amount, fecha: i.date, descripcion: i.description })),
+            egresos: items.filter(i => i.type === 'expense').map(i => ({ ...i.toJSON(), monto: i.amount, fecha: i.date, descripcion: i.description })),
+            pagos: items.filter(i => i.type === 'payment').map(i => ({ ...i.toJSON(), monto: i.amount, fecha: i.date, descripcion: i.description, isPaid: i.is_paid })),
+            metaAhorro: 0, // Placeholder
             ahorroActual: items.filter(i => i.type === 'saving').reduce((acc, curr) => acc + curr.amount, 0),
-            plannedIncomes: []
+            plannedIncomes: items.filter(i => i.type === 'planned_income').map(i => ({ ...i.toJSON(), monto: i.amount, fecha: i.date, descripcion: i.description, isReceived: i.is_paid })),
+            savingsImage: items.find(i => i.type === 'savings_image_url')?.description || null // Hacky storage for image URL if needed, or better use a settings table. 
+            // Better: Just check if we saved it in a separate file or metadata. 
+            // For now, let's assume the frontend handles it or we return it if we stored it.
         };
+
+        // If we want to persist savingsImage properly, we might need a separate model or a special item.
+        // Let's check if the Settings page upload stored it somewhere. 
+        // The Settings page updated "savingsImage" in the finance JSON endpoint.
+        // We need to support saving/retrieving that property. 
+        // Let's add a "metadata" item or similar.
+
         res.json(data);
     } catch (err) {
         res.status(500).json({ error: err.message });

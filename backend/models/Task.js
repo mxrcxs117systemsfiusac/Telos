@@ -23,6 +23,9 @@ const Task = sequelize.define('Task', {
     priority: {
         type: DataTypes.ENUM('low', 'medium', 'high'),
         defaultValue: 'medium'
+    },
+    description: {
+        type: DataTypes.TEXT
     }
 });
 

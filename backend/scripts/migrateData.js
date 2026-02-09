@@ -67,79 +67,50 @@ const migrate = async () => {
             console.log(`Migrated ${transactions.length} finance items.`);
         }
 
-        // 3. Schedule
-        const scheduleData = readJson('schedule.json');
-        if (scheduleData && scheduleData.events) {
-            const events = scheduleData.events.map(evt => ({
-                user_id: userId,
-                title: evt.title,
-                // For recurring weekly schedule, we might need a strategy. 
-                // For now, let's just store the start/end times on a dummy date or current date if implied.
-                // However, the current Schedule model expects DATE objects.
-                // The JSON has "day": "Lunes", "start": "07:10".
-                // We should probably adapt the Schedule model or the data. 
-                // For this migration, let's assume we want to keep them as recurring items if possible, 
-                // but the SQL model might be designed for specific instances. 
-                // Let's map them to a base date (e.g., next occurrence of that day).
-                // notes: existing schedule.json structure is strictly weekly class schedule.
-                // existing SQL ScheduleEvent is date-based. 
-                // STRATEGY: Create events for the next 24 weeks based on the weekly schedule?
-                // OR: Just ignore precise dates and put them in a way the frontend understands if it filters by day?
-                // Visualizing Schedule.js model: start (DATE), end (DATE).
-                // Let's create one instance for the upcoming week for each event to start with.
-                start: new Date(), // Placeholder will need refinement for real usage
-                end: new Date(),
-                allDay: false,
-                category: 'class',
-                description: evt.description // Note: ScheduleEvent model doesn't have description in the definition I saw earlier, checking...
-                // Schedule.js: title, start, end, allDay, category. NO description.
-                // I should probably add description to ScheduleEvent model later.
-            })).filter(e => false); // DISABLED for now to avoid cluttering with wrong dates. 
-            // WAIT - The user wants to TRANSFER EVERYTHING. 
-            // I should modify the Schedule model to support the "Day of week" + "Time" format OR generate actual dates.
-            // Let's Update Schedule model in a separate step if strictly needed, but for now let's just create them for the current week.
+        // 3. Schedule - CLEARED AS REQUESTED
+        // const scheduleData = readJson('schedule.json');
+        // if (scheduleData && scheduleData.events) {
+        //     const daysMap = { 'Domingo': 0, 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6 };
+        //     const today = new Date();
+        //     const currentDay = today.getDay();
 
-            // Actually, let's map them properly.
-            const daysMap = { 'Domingo': 0, 'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sábado': 6 };
-            const today = new Date();
-            const currentDay = today.getDay();
+        //     const newEvents = [];
+        //     scheduleData.events.forEach(evt => {
+        //         const targetDay = daysMap[evt.day];
+        //         if (targetDay !== undefined) {
+        //             // Calculate date for this day in the current week
+        //             const diff = targetDay - currentDay;
+        //             const evtDate = new Date(today);
+        //             evtDate.setDate(today.getDate() + (diff));
 
-            const newEvents = [];
-            scheduleData.events.forEach(evt => {
-                const targetDay = daysMap[evt.day];
-                if (targetDay !== undefined) {
-                    // Calculate date for this day in the current week
-                    const diff = targetDay - currentDay;
-                    const evtDate = new Date(today);
-                    evtDate.setDate(today.getDate() + (diff));
+        //             // Set times
+        //             const [startH, startM] = evt.start.split(':').map(Number);
+        //             const [endH, endM] = evt.end.split(':').map(Number);
 
-                    // Set times
-                    const [startH, startM] = evt.start.split(':').map(Number);
-                    const [endH, endM] = evt.end.split(':').map(Number);
+        //             const startDate = new Date(evtDate);
+        //             startDate.setHours(startH, startM, 0);
 
-                    const startDate = new Date(evtDate);
-                    startDate.setHours(startH, startM, 0);
+        //             const endDate = new Date(evtDate);
+        //             endDate.setHours(endH, endM, 0);
 
-                    const endDate = new Date(evtDate);
-                    endDate.setHours(endH, endM, 0);
-
-                    // Create recurring events for next 16 weeks (semester)
-                    for (let i = 0; i < 16; i++) {
-                        const s = new Date(startDate); s.setDate(s.getDate() + (i * 7));
-                        const e = new Date(endDate); e.setDate(e.getDate() + (i * 7));
-                        newEvents.push({
-                            user_id: userId,
-                            title: evt.title,
-                            start: s,
-                            end: e,
-                            category: 'class'
-                        });
-                    }
-                }
-            });
-            await ScheduleEvent.bulkCreate(newEvents);
-            console.log(`Migrated ${newEvents.length} schedule events (expanded to 16 weeks).`);
-        }
+        //             // Create recurring events for next 16 weeks (semester)
+        //             for (let i = 0; i < 16; i++) {
+        //                 const s = new Date(startDate); s.setDate(s.getDate() + (i * 7));
+        //                 const e = new Date(endDate); e.setDate(e.getDate() + (i * 7));
+        //                 newEvents.push({
+        //                     user_id: userId,
+        //                     title: evt.title,
+        //                     start: s,
+        //                     end: e,
+        //                     category: 'class'
+        //                 });
+        //             }
+        //         }
+        //     });
+        //     await ScheduleEvent.bulkCreate(newEvents);
+        //     console.log(`Migrated ${newEvents.length} schedule events (expanded to 16 weeks).`);
+        // }
+        console.log('Schedule events skipped (cleared).');
 
         // 4. Study
         const studyData = readJson('study.json');
@@ -149,6 +120,7 @@ const migrate = async () => {
                 const tasks = studyData.tasks.map(t => ({
                     user_id: userId,
                     title: t.text,
+                    description: t.description || '', // Added description mapping
                     subject: t.category, // using category as subject
                     status: t.completed ? 'completed' : 'pending',
                     deadline: t.date ? new Date(t.date) : null,
@@ -183,18 +155,19 @@ const migrate = async () => {
             }
         }
 
-        // 5. Devotional
-        const devotionalData = readJson('devotional.json');
-        if (devotionalData && devotionalData.entries) {
-            const entries = devotionalData.entries.map(e => ({
-                user_id: userId,
-                date: new Date(), // JSON didn't have dates, default to today
-                bible_verse: e.citation,
-                content: e.text
-            }));
-            await DevotionalEntry.bulkCreate(entries);
-            console.log(`Migrated ${entries.length} devotional entries.`);
-        }
+        // 5. Devotional - CLEARED AS REQUESTED
+        // const devotionalData = readJson('devotional.json');
+        // if (devotionalData && devotionalData.entries) {
+        //     const entries = devotionalData.entries.map(e => ({
+        //         user_id: userId,
+        //         date: new Date(), // JSON didn't have dates, default to today
+        //         bible_verse: e.citation,
+        //         content: e.text
+        //     }));
+        //     await DevotionalEntry.bulkCreate(entries);
+        //     console.log(`Migrated ${entries.length} devotional entries.`);
+        // }
+        console.log('Devotional entries skipped (cleared).');
 
         // 6. Programming
         const programmingData = readJson('programming.json');

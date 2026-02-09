@@ -1,14 +1,53 @@
 import { useState, useEffect } from 'react';
-import { Upload, FileJson, Image, FileText, Database, Check, Trash2 } from 'lucide-react';
+import { Upload, Image, FileText, Database, Check, Trash2, User } from 'lucide-react';
 import { Settings } from 'lucide-react';
 
 export default function SettingsPage() {
-    const [activeTab, setActiveTab] = useState('data');
+    const [activeTab, setActiveTab] = useState('profile');
     const [statusMsg, setStatusMsg] = useState('');
+
+    // State for Profile
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (password && password !== confirmPassword) {
+            showStatus('Las contraseñas no coinciden', true);
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:3001/api/auth/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    username: username || undefined,
+                    password: password || undefined
+                })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                if (data.token) localStorage.setItem('token', data.token);
+                showStatus('Perfil actualizado correctamente');
+                setPassword('');
+                setConfirmPassword('');
+            } else {
+                showStatus(data.error || 'Error al actualizar', true);
+            }
+        } catch (err) {
+            showStatus('Error de conexión', true);
+        }
+    };
 
     // State for Data Status
     const [hasVerses, setHasVerses] = useState(false);
-    const [hasSchedule, setHasSchedule] = useState(false);
 
     // State for Image Upload
     const [uploadingImg, setUploadingImg] = useState(false);
@@ -21,12 +60,12 @@ export default function SettingsPage() {
             if (data.entries?.length > 0 || data.versiculos?.length > 0) setHasVerses(true);
         }).catch(() => { });
 
-        fetch('http://localhost:3001/api/schedule').then(res => res.json()).then(data => {
-            if (data.events?.length > 0) setHasSchedule(true);
-        }).catch(() => { });
-
         fetch('http://localhost:3001/api/finance').then(res => res.json()).then(data => {
             if (data.savingsImage) setSavingsImage(data.savingsImage);
+        }).catch(() => { });
+
+        fetch('http://localhost:3001/api/schedule').then(res => res.json()).then(data => {
+            // Schedule check removed
         }).catch(() => { });
 
         fetch('http://localhost:3001/api/study/pdfs').then(res => res.json()).then(data => {
@@ -40,58 +79,6 @@ export default function SettingsPage() {
         if (!isError) {
             setTimeout(() => setStatusMsg(''), 3000);
         }
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'schedule' | 'verses') => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            try {
-                const text = event.target?.result as string;
-                const json = JSON.parse(text);
-
-                if (type === 'verses') {
-                    // Handle Verses
-                    // Expected format: Array of verses OR object with "versiculos"
-                    let entries = Array.isArray(json) ? json : (json.versiculos || json.entries || []);
-
-                    // Normalize standard
-                    if (!Array.isArray(entries)) throw new Error("Formato inválido");
-
-                    const res = await fetch('http://localhost:3001/api/devotional');
-                    const current = await res.json();
-                    const newData = { ...current, entries: entries }; // Store as entries
-
-                    await fetch('http://localhost:3001/api/devotional', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newData)
-                    });
-                    setHasVerses(true);
-                    showStatus('Versículos actualizados correctamente');
-
-                } else if (type === 'schedule') {
-                    // Handle Schedule
-                    // Expected standard format or just replace entire object
-                    await fetch('http://localhost:3001/api/schedule', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(json)
-                    });
-                    setHasSchedule(true);
-                    showStatus('Horario actualizado correctamente');
-                }
-
-            } catch (err) {
-                console.error(err);
-                showStatus('Error: Archivo JSON inválido', true);
-            }
-        };
-        reader.readAsText(file);
-        // Reset input
-        e.target.value = '';
     };
 
     const handleReset = async (type: 'schedule' | 'verses') => {
@@ -111,7 +98,7 @@ export default function SettingsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ config: { startHour: 7, endHour: 21 }, events: [] })
             });
-            setHasSchedule(false);
+            // Schedule reset
             showStatus('Horario reiniciado');
         }
     };
@@ -256,6 +243,9 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Tabs */}
                 <div className="md:col-span-1 space-y-2">
+                    <button onClick={() => setActiveTab('profile')} className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'profile' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>
+                        <div className="flex items-center gap-2"><User className="w-4 h-4" /> Perfil</div>
+                    </button>
                     <button onClick={() => setActiveTab('data')} className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'data' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>
                         <div className="flex items-center gap-2"><Database className="w-4 h-4" /> Datos JSON</div>
                     </button>
@@ -267,56 +257,103 @@ export default function SettingsPage() {
                 {/* Content */}
                 <div className="md:col-span-3 space-y-6">
 
+                    {activeTab === 'profile' && (
+                        <div className="glass-panel p-6 rounded-xl">
+                            <h3 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
+                                <User className="text-indigo-400" /> Editar Perfil
+                            </h3>
+                            <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-md">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nuevo Usuario (Opcional)</label>
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={e => setUsername(e.target.value)}
+                                        placeholder="Dejar en blanco para mantener actual"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-400 mb-1">Nueva Contraseña (Opcional)</label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={e => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-400 mb-1">Confirmar Contraseña</label>
+                                    <input
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={e => setConfirmPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-indigo-500"
+                                    />
+                                </div>
+                                <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                                    Guardar Cambios
+                                </button>
+                            </form>
+                        </div>
+                    )}
+
                     {activeTab === 'data' && (
                         <div className="space-y-6">
-                            {/* Verses */}
+                            {/* Manual Verse Add */}
                             <div className="glass-panel p-6 rounded-xl relative overflow-hidden group">
                                 <h3 className="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                    <FileJson className="text-purple-400" /> Versículos
-                                    {hasVerses && <span title="Datos cargados"><Check className="w-5 h-5 text-emerald-500" /></span>}
+                                    <FileText className="text-purple-400" /> Agregar Versículo
                                 </h3>
-                                <div className="p-6 border-2 border-dashed border-white/10 rounded-xl hover:border-purple-500/50 hover:bg-white/5 transition-all text-center">
-                                    <label className="cursor-pointer block">
-                                        <input type="file" accept=".json" className="hidden" onChange={(e) => handleFileUpload(e, 'verses')} />
-                                        <div className="flex flex-col items-center gap-2 text-slate-400">
-                                            <Upload className="w-8 h-8" />
-                                            <span>Subir JSON de Versículos</span>
-                                        </div>
-                                    </label>
-                                </div>
-                                {hasVerses && (
-                                    <div className="mt-4 flex justify-between items-center text-sm bg-white/5 p-3 rounded-lg">
-                                        <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> Archivo cargado</span>
-                                        <button onClick={() => handleReset('verses')} className="text-rose-400 hover:text-rose-300 flex items-center gap-1">
-                                            <Trash2 className="w-3 h-3" /> Eliminar
-                                        </button>
+
+                                <form onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const form = e.target as HTMLFormElement;
+                                    const text = (form.elements.namedItem('text') as HTMLInputElement).value;
+                                    const citation = (form.elements.namedItem('citation') as HTMLInputElement).value;
+
+                                    if (!text || !citation) return;
+
+                                    try {
+                                        const res = await fetch('http://localhost:3001/api/devotional', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                                            body: JSON.stringify({ text, citation })
+                                        });
+                                        if (res.ok) {
+                                            showStatus('Versículo agregado correctamente');
+                                            form.reset();
+                                            setHasVerses(true);
+                                        } else {
+                                            showStatus('Error al agregar', true);
+                                        }
+                                    } catch (err) { showStatus('Error de conexión', true); }
+                                }} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Cita Bíblica</label>
+                                        <input name="citation" placeholder="Ej. Juan 3:16" className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-slate-200 focus:border-purple-500 outline-none" />
                                     </div>
-                                )}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Texto</label>
+                                        <textarea name="text" placeholder="Porque de tal manera amó Dios al mundo..." className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-slate-200 focus:border-purple-500 outline-none h-24 resize-none" />
+                                    </div>
+                                    <button type="submit" className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg w-full transition-colors">
+                                        Guardar Versículo
+                                    </button>
+                                </form>
                             </div>
 
-                            {/* Schedule */}
-                            <div className="glass-panel p-6 rounded-xl">
-                                <h3 className="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                    <FileJson className="text-blue-400" /> Horario
-                                    {hasSchedule && <span title="Datos cargados"><Check className="w-5 h-5 text-emerald-500" /></span>}
+                            {/* Reset Zone */}
+                            <div className="glass-panel p-6 rounded-xl border border-rose-500/20">
+                                <h3 className="text-lg font-bold text-rose-400 mb-4 flex items-center gap-2">
+                                    <Trash2 className="w-5 h-5" /> Zona de Peligro
                                 </h3>
-                                <div className="p-6 border-2 border-dashed border-white/10 rounded-xl hover:border-blue-500/50 hover:bg-white/5 transition-all text-center">
-                                    <label className="cursor-pointer block">
-                                        <input type="file" accept=".json" className="hidden" onChange={(e) => handleFileUpload(e, 'schedule')} />
-                                        <div className="flex flex-col items-center gap-2 text-slate-400">
-                                            <Upload className="w-8 h-8" />
-                                            <span>Subir JSON de Horario</span>
-                                        </div>
-                                    </label>
-                                </div>
-                                {hasSchedule && (
-                                    <div className="mt-4 flex justify-between items-center text-sm bg-white/5 p-3 rounded-lg">
-                                        <span className="text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> Archivo cargado</span>
-                                        <button onClick={() => handleReset('schedule')} className="text-rose-400 hover:text-rose-300 flex items-center gap-1">
-                                            <Trash2 className="w-3 h-3" /> Eliminar
-                                        </button>
-                                    </div>
-                                )}
+                                <p className="text-sm text-slate-400 mb-4">Estas acciones no se pueden deshacer.</p>
+                                <button onClick={() => handleReset('verses')} className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/50 py-2 px-4 rounded-lg transition-colors font-medium">
+                                    Borrar todos los versículos
+                                </button>
                             </div>
                         </div>
                     )}

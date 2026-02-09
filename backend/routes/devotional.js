@@ -12,12 +12,6 @@ router.get('/', async (req, res) => {
         const entries = await DevotionalEntry.findAll({
             where: { user_id: req.user.id }
         });
-        // Transform to match legacy format if needed, or update frontend
-        // Legacy: { entries: [ { text, citation } ] }
-        // We can return list directly or wrap it?
-        // Let's check frontend expectation. But for now, let's return the list.
-        // Wait, legacy handler returned the whole JSON object: { entries: [...] }
-        // So we should probably return { entries: [...] } to avoid breaking frontend
 
         const safeEntries = entries.map(e => ({
             id: e.id,
@@ -27,6 +21,33 @@ router.get('/', async (req, res) => {
         }));
 
         res.json({ entries: safeEntries });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Upload JSON endpoint
+router.post('/upload', async (req, res) => {
+    try {
+        let entries = req.body.entries;
+        // Accept direct array or wrapped in object
+        if (!entries && Array.isArray(req.body)) {
+            entries = req.body;
+        }
+
+        if (!Array.isArray(entries)) {
+            return res.status(400).json({ error: 'Invalid format. Expected array or { entries: [] }' });
+        }
+
+        const newEntries = entries.map(e => ({
+            user_id: req.user.id,
+            content: e.text || e.content,
+            bible_verse: e.citation || e.bible_verse,
+            date: e.date ? new Date(e.date) : new Date() // Use provided date or now
+        }));
+
+        await DevotionalEntry.bulkCreate(newEntries);
+        res.json({ success: true, count: newEntries.length });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

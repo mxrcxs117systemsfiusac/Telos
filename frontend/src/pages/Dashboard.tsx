@@ -66,8 +66,8 @@ export default function Dashboard() {
                                     }
                                 }
                             } else if (!item.completed) {
-                                // Simple item
-                                // allTasks.push({ id: item.id, text: item.text, date: 'Pendiente', source: 'plan' });
+                                // Simple item (Checklist)
+                                allTasks.push({ id: item.id, text: item.text, date: 'Pendiente', source: 'plan' });
                             }
                         });
                     });
@@ -82,17 +82,30 @@ export default function Dashboard() {
 
         fetchTasks();
 
-        // Fetch Verse (Devotional)
+        // Fetch Verse (Devotional) & Setup Rotation
         fetch('http://localhost:3001/api/devotional')
             .then(res => res.json())
             .then(data => {
                 const entries = data.entries || data.versiculos || [];
                 if (entries.length > 0) {
+                    // Initial
                     const random = entries[Math.floor(Math.random() * entries.length)];
                     setVerse({
                         text: random.text || random.texto || random.verse || "No text",
                         citation: random.citation || random.cita || "Unknown"
                     });
+
+                    // Auto-rotate every 30s
+                    if (entries.length > 1) {
+                        const interval = setInterval(() => {
+                            const nextRandom = entries[Math.floor(Math.random() * entries.length)];
+                            setVerse({
+                                text: nextRandom.text || nextRandom.texto || nextRandom.verse || "No text",
+                                citation: nextRandom.citation || nextRandom.cita || "Unknown"
+                            });
+                        }, 30000); // 30 seconds
+                        return () => clearInterval(interval);
+                    }
                 } else {
                     setVerse({ text: "Todo lo puedo en Cristo que me fortalece.", citation: "Filipenses 4:13" });
                 }

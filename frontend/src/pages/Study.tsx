@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-    Book, CheckSquare, Plus, Trash2, FileText,
+    Book, CheckSquare, Plus, Trash2,
     ChevronLeft, ChevronRight, ZoomIn, ZoomOut, GraduationCap, Clock
 } from 'lucide-react';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -47,7 +47,7 @@ export default function StudyPage() {
 
     // --- UI State ---
     const [activeTab, setActiveTab] = useState<'tasks' | 'glossary'>('tasks');
-    const [taskTab, setTaskTab] = useState<'in_progress' | 'upcoming' | 'finished'>('in_progress');
+    const [taskTab, setTaskTab] = useState<'in_progress' | 'upcoming' | 'all' | 'finished'>('in_progress');
 
     // --- Task Form State ---
     const [showTaskForm, setShowTaskForm] = useState(false);
@@ -98,6 +98,8 @@ export default function StudyPage() {
             filtered = filtered.filter(t => t.status !== 'completed' && (t.deadline || '') <= today);
         } else if (taskTab === 'upcoming') {
             filtered = filtered.filter(t => t.status !== 'completed' && (t.deadline || '') > today && (t.deadline || '') <= nextWeekStr);
+        } else if (taskTab === 'all') {
+            filtered = filtered.filter(t => t.status !== 'completed');
         } else if (taskTab === 'finished') {
             filtered = filtered.filter(t => t.status === 'completed');
         }
@@ -226,6 +228,7 @@ export default function StudyPage() {
                         <div className="flex gap-2 mb-4 shrink-0 overflow-x-auto p-1 custom-scrollbar">
                             <button onClick={() => setTaskTab('in_progress')} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${taskTab === 'in_progress' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/50' : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'}`}>En Progreso</button>
                             <button onClick={() => setTaskTab('upcoming')} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${taskTab === 'upcoming' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50' : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'}`}>Próximas (7d)</button>
+                            <button onClick={() => setTaskTab('all')} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${taskTab === 'all' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50' : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'}`}>Todas</button>
                             <button onClick={() => setTaskTab('finished')} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${taskTab === 'finished' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' : 'bg-white/5 text-slate-400 border border-white/5 hover:bg-white/10'}`}>Finalizadas</button>
                         </div>
 
@@ -238,6 +241,7 @@ export default function StudyPage() {
                             <div className="glass-panel p-4 rounded-xl space-y-3 border-l-4 border-indigo-500 animate-slide-down shrink-0 mb-4">
                                 <h4 className="text-sm font-bold text-slate-200 mb-2">{editingId ? 'Editar Tarea' : 'Nueva Tarea'}</h4>
                                 <input className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-slate-200 outline-none" placeholder="Título..." value={newTask.title || ''} onChange={e => setNewTask({ ...newTask, title: e.target.value })} />
+                                <textarea className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-slate-200 outline-none resize-none h-16" placeholder="Descripción (opcional)..." value={newTask.description || ''} onChange={e => setNewTask({ ...newTask, description: e.target.value })} />
                                 <input type="date" className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-slate-200" value={newTask.deadline} onChange={e => setNewTask({ ...newTask, deadline: e.target.value })} />
                                 {/* Simplified category select */}
                                 <select className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-slate-200" value={newTask.subject} onChange={e => setNewTask({ ...newTask, subject: e.target.value })}>
