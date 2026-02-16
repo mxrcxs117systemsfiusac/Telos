@@ -39,7 +39,10 @@ app.use('/pdfs', express.static(path.join(DATA_DIR, 'pdfs')));
 app.use('/images', express.static(path.join(DATA_DIR, 'images')));
 
 const IMG_DIR = path.join(DATA_DIR, 'images');
+const PDF_DIR = path.join(DATA_DIR, 'pdfs');
+
 if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
+if (!fs.existsSync(PDF_DIR)) fs.mkdirSync(PDF_DIR, { recursive: true });
 
 // Image Upload
 app.post('/api/settings/upload-image', (req, res) => {
@@ -85,6 +88,12 @@ app.use('/api/study', studyRoutes);
 app.use('/api/devotional', devotionalRoutes);
 app.use('/api/programming', programmingRoutes);
 
+
+// 404 Handler for Debugging
+app.use((req, res) => {
+    console.log(`404 Not Found: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({ error: `Route not found: ${req.originalUrl}` });
+});
 
 // Start Server
 sequelize.sync().then(() => {

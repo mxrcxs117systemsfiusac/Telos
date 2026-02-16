@@ -34,6 +34,39 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
+// Update generic finance data (e.g. Savings Image)
+router.post('/', authenticateToken, async (req, res) => {
+    try {
+        const { savingsImage } = req.body;
+
+        if (savingsImage !== undefined) {
+            // Check if exists
+            let item = await FinanceItem.findOne({ where: { user_id: req.user.id, type: 'savings_image_url' } });
+            if (item) {
+                if (savingsImage === null) {
+                    await item.destroy();
+                } else {
+                    item.description = savingsImage;
+                    await item.save();
+                }
+            } else if (savingsImage) {
+                await FinanceItem.create({
+                    user_id: req.user.id,
+                    type: 'savings_image_url',
+                    amount: 0,
+                    category: 'System',
+                    description: savingsImage,
+                    date: new Date()
+                });
+            }
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Generic Add Item
 router.post('/add', authenticateToken, async (req, res) => {
     try {

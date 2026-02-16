@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../utils/api';
 
 interface User {
     id: number;
@@ -26,13 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // Ideally verify token with backend here
             // For now, decode or just trust existence + try to fetch user
             setToken(savedToken);
-            fetch('/api/auth/me', {
-                headers: { Authorization: `Bearer ${savedToken}` }
-            })
-                .then(res => {
-                    if (res.ok) return res.json();
-                    throw new Error('Invalid token');
-                })
+            api.get('/auth/me')
                 .then(data => {
                     setUser(data.user);
                 })

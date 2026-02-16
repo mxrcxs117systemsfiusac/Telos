@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-    LayoutDashboard, Wallet, Calendar, Book, Wrench, Bot,
+    LayoutDashboard, Wallet, Calendar, Book, Wrench,
     Code, Menu, Settings, LogOut
 } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export default function DashboardLayout() {
         { to: "/study", icon: Book, label: "Estudio" },
         // Devotional Removed
         { to: "/engineering", icon: Wrench, label: "Ingeniería" },
-        { to: "/ai", icon: Bot, label: "Inteligencia Artificial" },
+
         { to: "/programming", icon: Code, label: "Plan" }, // Renamed to "Plan" as requested
         { to: "/settings", icon: Settings, label: "Ajustes" }, // New Settings Item
     ];

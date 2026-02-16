@@ -60,12 +60,14 @@ export default function PlanPage() {
             .catch(err => console.error(err));
     }, []);
 
-    const saveSections = async (updatedSections: Section[]) => {
+    const saveSections = async (updatedSections: Section[], manual = false) => {
         setSections(updatedSections);
         try {
             await api.post('/programming', { sections: updatedSections });
-        } catch (err) {
+            if (manual) alert('Guardado correctamente');
+        } catch (err: any) {
             console.error("Failed to save sections", err);
+            if (manual) alert(`Error al guardar: ${err.message || 'Error desconocido'}`);
         }
     };
 
@@ -274,8 +276,19 @@ export default function PlanPage() {
                     <button onClick={addSection} className="bg-emerald-600 hover:bg-emerald-500 text-white p-2 rounded-lg">
                         <FolderPlus className="w-5 h-5" />
                     </button>
+                    <button
+                        onClick={() => saveSections(sections)}
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold shadow-lg shadow-blue-900/20 active:scale-95 transition-all"
+                    >
+                        <Save className="w-5 h-5" /> Guardar Todo
+                    </button>
                 </div>
             </header>
+
+            {/* Status Message */}
+            <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+                {/* Hacky way to show status via console for now, or just trust the button visual feedback if added */}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pb-20">
                 {sections.map(section => (

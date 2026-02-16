@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
     Wallet, Calendar, Wrench,
-    Code, GraduationCap, Brain,
+    Code, GraduationCap,
     ExternalLink, Bell, CheckCircle, AlertCircle, Eye, EyeOff
 } from 'lucide-react';
 import { useFinance } from '../hooks/useFinance';
-import { useSchedule } from '../hooks/useSchedule';
+
 
 import { api } from '../utils/api';
 
@@ -15,7 +15,6 @@ import { api } from '../utils/api';
 export default function Dashboard() {
     const navigate = useNavigate();
     const { balance, pagos, isLoaded: financeLoaded } = useFinance();
-    const { schedule, isLoaded: scheduleLoaded } = useSchedule();
 
     // State
     const [tasks, setTasks] = useState<{ id: number, text: string, description?: string, date: string, source: 'study' | 'plan', completed?: boolean }[]>([]);
@@ -123,7 +122,7 @@ export default function Dashboard() {
         { title: "Estudio", icon: GraduationCap, color: "text-amber-400", path: "/study" },
         // Devotional removed
         { title: "Ingeniería", icon: Wrench, color: "text-slate-400", path: "/engineering" },
-        { title: "IA", icon: Brain, color: "text-indigo-400", path: "/ai" },
+
         { title: "Plan Dev", icon: Code, color: "text-cyan-400", path: "/programming" },
     ];
 
@@ -133,65 +132,6 @@ export default function Dashboard() {
         { label: "Portal Ing", url: "https://portal.ingenieria.usac.edu.gt", icon: "🏛️" },
     ];
 
-    // Calculate Next Class
-    const getNextClass = () => {
-        if (!scheduleLoaded || !schedule.events.length) return null;
-
-
-        const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
-        const now = new Date();
-        const currentDayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Mon, ... 6=Sun
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
-        const currentTime = currentHour * 60 + currentMinute;
-
-        // Helper to parse time string "HH:MM" -> minutes
-        const parseTime = (t: string) => {
-            const [h, m] = t.split(':').map(Number);
-            return h * 60 + m;
-        };
-
-        // Check today first
-        const todayKey = dayOrder[currentDayIndex];
-        const todayEvents = schedule.events
-            .filter((e: any) => e.day && typeof e.day === 'string' && e.day.toLowerCase() === todayKey)
-            .sort((a: any, b: any) => parseTime(a.start) - parseTime(b.start));
-
-        const nextToday = todayEvents.find((e: any) => parseTime(e.start) > currentTime);
-        if (nextToday) return { ...nextToday, isToday: true, dayName: todayKey };
-
-        // Check future days
-        for (let i = 1; i < 7; i++) {
-            const nextDayIndex = (currentDayIndex + i) % 7;
-            const nextDayKey = dayOrder[nextDayIndex];
-
-            const nextDayEvents = schedule.events
-                .filter((e: any) => e.day && typeof e.day === 'string' && e.day.toLowerCase() === nextDayKey)
-                .sort((a: any, b: any) => parseTime(a.start) - parseTime(b.start));
-
-            if (nextDayEvents.length > 0) {
-                return { ...nextDayEvents[0], isToday: false, dayName: nextDayKey };
-            }
-        }
-
-        return null;
-    };
-
-    const translateDay = (day: string) => {
-        const days: Record<string, string> = {
-            'monday': 'Lunes',
-            'tuesday': 'Martes',
-            'wednesday': 'Miércoles',
-            'thursday': 'Jueves',
-            'friday': 'Viernes',
-            'saturday': 'Sábado',
-            'sunday': 'Domingo'
-        };
-        return days[day.toLowerCase()] || day;
-    };
-
-    const nextClass = getNextClass();
     const pendingPayments = pagos.filter(p => !p.isPaid);
 
     return (
@@ -204,25 +144,7 @@ export default function Dashboard() {
             </header>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="glass-panel p-5 rounded-xl border-l-4 border-indigo-500">
-                    <h3 className="text-slate-400 text-sm font-medium uppercase">Próxima Clase</h3>
-                    {nextClass ? (
-                        <>
-                            <p className="text-xl font-bold mt-1 truncate">{nextClass.title}</p>
-                            <div className="flex flex-col mt-2">
-                                <span className="text-xs text-indigo-400 font-medium">
-                                    {nextClass.isToday ? 'HOY' : translateDay(nextClass.dayName)}
-                                </span>
-                                <span className="text-xs text-slate-400">
-                                    {nextClass.start} - {nextClass.end}
-                                </span>
-                            </div>
-                        </>
-                    ) : (
-                        <p className="text-slate-500 italic mt-1">No hay clases programadas</p>
-                    )}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="glass-panel p-5 rounded-xl border-l-4 border-emerald-500 relative group">
                     <div className="flex justify-between items-start">
                         <h3 className="text-slate-400 text-sm font-medium uppercase">Finanzas</h3>

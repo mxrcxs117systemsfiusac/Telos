@@ -1,5 +1,5 @@
 import express from 'express';
-import { Goal } from '../models/index.js';
+import { Goal, sequelize } from '../models/index.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -49,15 +49,18 @@ router.get('/', async (req, res) => {
 
 // Save all goals (Full Sync)
 router.post('/', async (req, res) => {
+    // Start Transaction
+    const t = await sequelize.transaction();
+
     try {
         const { sections } = req.body;
         if (!sections || !Array.isArray(sections)) {
+            await t.rollback();
             return res.status(400).json({ error: 'Invalid format. Expected { sections: [] }' });
         }
 
-        // 1. Delete all existing goals for this user (to handle deletions/moves)
-        // In a production app, we might want to be smarter (update existing), but for this scale, flush & rewrite is fine and safer for consistency.
-        await Goal.destroy({ where: { user_id: req.user.id } });
+        // 1. Delete all existing goals for this user
+        await Goal.destroy({ where: { user_id: req.user.id }, transaction: t });
 
         // 2. Prepare new items
         const newGoals = [];
@@ -71,7 +74,7 @@ router.post('/', async (req, res) => {
                     category: section.title,
                     startDate: item.startDate || null,
                     endDate: item.endDate || null,
-                    status: item.completed ? 'completed' : 'active',
+                    status: item.completed ? 'completed' : 'not_progressed',
                     logs: item.dailyLogs || {}
                 });
             }
@@ -79,11 +82,16 @@ router.post('/', async (req, res) => {
 
         // 3. Bulk Create
         if (newGoals.length > 0) {
-            await Goal.bulkCreate(newGoals);
+            await Goal.bulkCreate(newGoals, { transaction: t });
         }
 
+        // Commit
+        await t.commit();
         res.json({ success: true, count: newGoals.length });
+
     } catch (err) {
+        // Rollback
+        await t.rollback();
         console.error("Error saving goals:", err);
         res.status(500).json({ error: err.message });
     }
