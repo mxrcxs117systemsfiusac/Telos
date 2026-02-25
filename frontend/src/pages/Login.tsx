@@ -61,7 +61,7 @@ export default function Login() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full bg-[#0a0c10] border border-white/10 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 outline-none transition-all text-white placeholder-slate-600"
-                                placeholder="ej. admin"
+                                placeholder="           "
                                 required
                             />
                         </div>
@@ -78,7 +78,7 @@ export default function Login() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full bg-[#0a0c10] border border-white/10 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 outline-none transition-all text-white placeholder-slate-600"
-                                placeholder="••••••••"
+                                placeholder="•••••••••••••"
                                 required
                             />
                         </div>
