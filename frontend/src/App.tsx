@@ -10,7 +10,7 @@ import SchedulePage from './pages/Schedule';
 import StudyPage from './pages/Study';
 // Devotional removed
 
-import { EngineeringPage, AIPage } from './pages/Portals';
+import { EngineeringPage, AIPage, TheologyPage } from './pages/Portals';
 import PlanPage from './pages/Plan';
 
 import SettingsPage from './pages/Settings';
@@ -35,6 +35,7 @@ function App() {
 
             <Route path="engineering" element={<EngineeringPage />} />
             <Route path="ai" element={<AIPage />} />
+            <Route path="theology" element={<TheologyPage />} />
             <Route path="programming" element={<PlanPage />} />
             <Route path="settings" element={<SettingsPage />} />
 

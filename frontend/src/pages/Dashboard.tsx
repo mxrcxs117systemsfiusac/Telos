@@ -2,26 +2,22 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
     Wallet, Calendar, Wrench,
-    Code, GraduationCap,
-    ExternalLink, Bell, CheckCircle, AlertCircle, Eye, EyeOff
+    Code, GraduationCap, BookOpen,
+    Bell, CheckCircle, AlertCircle, Eye, EyeOff,
+    ArrowUpRight, TrendingUp, Sparkles, Target, Clock
 } from 'lucide-react';
 import { useFinance } from '../hooks/useFinance';
-
-
 import { api } from '../utils/api';
-
-// ... imports
 
 export default function Dashboard() {
     const navigate = useNavigate();
     const { balance, pagos, isLoaded: financeLoaded } = useFinance();
 
-    // State
     const [tasks, setTasks] = useState<{ id: number, text: string, description?: string, date: string, source: 'study' | 'plan', completed?: boolean }[]>([]);
     const [verse, setVerse] = useState<{ text: string, citation: string }>({ text: "Cargando...", citation: "" });
     const [showBalance, setShowBalance] = useState(false);
+    const [currentTime, setCurrentTime] = useState(new Date());
 
-    // Toggle Balance
     const toggleBalance = () => {
         const newState = !showBalance;
         setShowBalance(newState);
@@ -29,10 +25,13 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+        return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
         const fetchTasks = async () => {
             let allTasks: any[] = [];
-
-            // 1. Fetch Study Tasks
             try {
                 const data = await api.get('/study');
                 if (data.tasks) {
@@ -43,18 +42,14 @@ export default function Dashboard() {
                 }
             } catch (err) { console.error("Error loading study tasks", err); }
 
-            // 2. Fetch Plan Goals/Habits (Active today)
             try {
                 const data = await api.get('/programming');
                 const today = new Date().toISOString().split('T')[0];
-
                 if (data.sections) {
                     data.sections.forEach((section: any) => {
                         section.items.forEach((item: any) => {
-                            // If it's a Goal/Habit logic
                             if (item.type === 'goal' && item.startDate && item.endDate) {
                                 if (today >= item.startDate && today <= item.endDate) {
-                                    // Check if logged today
                                     const isDoneToday = item.dailyLogs?.[today]?.completed;
                                     if (!isDoneToday) {
                                         allTasks.push({
@@ -67,7 +62,6 @@ export default function Dashboard() {
                                     }
                                 }
                             } else if (!item.completed) {
-                                // Simple item (Checklist)
                                 allTasks.push({ id: item.id, text: item.text, date: 'Pendiente', source: 'plan' });
                             }
                         });
@@ -75,27 +69,21 @@ export default function Dashboard() {
                 }
             } catch (err) { console.error("Error loading plan tasks", err); }
 
-            // Sort by date (ascending)
             allTasks.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
             setTasks(allTasks);
         };
 
         fetchTasks();
 
-        // Fetch Verse (Devotional) & Setup Rotation
         api.get('/devotional')
             .then(data => {
                 const entries = data.entries || data.versiculos || [];
                 if (entries.length > 0) {
-                    // Initial
                     const random = entries[Math.floor(Math.random() * entries.length)];
                     setVerse({
                         text: random.text || random.texto || random.verse || "No text",
                         citation: random.citation || random.cita || "Unknown"
                     });
-
-                    // Auto-rotate every 30s
                     if (entries.length > 1) {
                         const interval = setInterval(() => {
                             const nextRandom = entries[Math.floor(Math.random() * entries.length)];
@@ -103,159 +91,183 @@ export default function Dashboard() {
                                 text: nextRandom.text || nextRandom.texto || nextRandom.verse || "No text",
                                 citation: nextRandom.citation || nextRandom.cita || "Unknown"
                             });
-                        }, 30000); // 30 seconds
+                        }, 30000);
                         return () => clearInterval(interval);
                     }
                 } else {
                     setVerse({ text: "No hay versículos guardados aún.", citation: "Ve a Ajustes para agregar." });
                 }
             })
-            .catch((err) => {
-                console.error("Dashboard Verse Error:", err);
+            .catch(() => {
                 setVerse({ text: "Error cargando versículos.", citation: "Intenta recargar." });
             });
     }, []);
 
     const features = [
-        { title: "Billetera", icon: Wallet, color: "text-emerald-400", path: "/wallet" },
-        { title: "Horario", icon: Calendar, color: "text-blue-400", path: "/schedule" },
-        { title: "Estudio", icon: GraduationCap, color: "text-amber-400", path: "/study" },
-        // Devotional removed
-        { title: "Ingeniería", icon: Wrench, color: "text-slate-400", path: "/engineering" },
-
-        { title: "Plan Dev", icon: Code, color: "text-cyan-400", path: "/programming" },
-    ];
-
-    const externalLinks = [
-        { label: "DTT", url: "https://dtt-ecys.org", icon: "🌐" },
-        { label: "Dashboard Ing", url: "https://dashboardacademico.ingenieria.usac.edu.gt/dashboard", icon: "📈" },
-        { label: "Portal Ing", url: "https://portal.ingenieria.usac.edu.gt", icon: "🏛️" },
+        { title: "Billetera", icon: Wallet, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20", path: "/wallet" },
+        { title: "Horario", icon: Calendar, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20", path: "/schedule" },
+        { title: "Estudio", icon: GraduationCap, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/20", path: "/study" },
+        { title: "Ingeniería", icon: Wrench, gradient: "from-slate-400 to-slate-600", shadow: "shadow-slate-500/20", path: "/engineering" },
+        { title: "Teología", icon: BookOpen, gradient: "from-amber-400 to-yellow-600", shadow: "shadow-amber-400/20", path: "/theology" },
+        { title: "Plan", icon: Code, gradient: "from-cyan-500 to-blue-600", shadow: "shadow-cyan-500/20", path: "/programming" },
     ];
 
     const pendingPayments = pagos.filter(p => !p.isPaid);
 
+    const greeting = () => {
+        const h = currentTime.getHours();
+        if (h < 12) return "Buenos días";
+        if (h < 18) return "Buenas tardes";
+        return "Buenas noches";
+    };
+
+    const formattedDate = new Intl.DateTimeFormat('es-GT', {
+        weekday: 'long', day: 'numeric', month: 'long'
+    }).format(currentTime);
+
     return (
-        <div className="space-y-8 animate-entry pb-10 w-full max-w-7xl mx-auto">
-            <header className="mb-8 block md:flex justify-between items-end">
-                <div>
-                    <h2 className="text-3xl font-bold text-slate-100">Hola, Marcos</h2>
-                    <p className="text-slate-500">Bienvenido a tu Centro de Control Total.</p>
+        <div className="space-y-6 pb-10 w-full max-w-7xl mx-auto animate-entry">
+            {/* Hero Header */}
+            <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600/20 via-purple-600/10 to-transparent border border-white/5 p-6 md:p-8">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] translate-y-1/2 -translate-x-1/4" />
+
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <Sparkles className="w-4 h-4 text-indigo-400" />
+                            <span className="text-xs font-semibold text-indigo-400 uppercase tracking-widest">{formattedDate}</span>
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                            {greeting()}, <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Marcos</span>
+                        </h2>
+                        <p className="text-slate-400 mt-1 text-sm">Tu centro de control está listo.</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <Clock className="w-4 h-4" />
+                        {currentTime.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                 </div>
             </header>
 
-            {/* Summary Cards */}
+            {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="glass-panel p-5 rounded-xl border-l-4 border-emerald-500 relative group">
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-slate-400 text-sm font-medium uppercase">Finanzas</h3>
-                        <button onClick={toggleBalance} className="text-slate-500 hover:text-white transition-colors">
-                            {showBalance ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                        </button>
+                {/* Finance Card */}
+                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-emerald-500/30 transition-all p-5">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-center mb-3">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Balance</span>
+                            </div>
+                            <button onClick={toggleBalance} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all">
+                                {showBalance ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            </button>
+                        </div>
+                        <p className={`text-2xl font-black tracking-tight ${financeLoaded ? 'text-white' : 'animate-pulse bg-white/10 w-24 h-7 rounded-lg'}`}>
+                            {financeLoaded ? (showBalance ? `Q${balance.toLocaleString()}` : '• • • • •') : ''}
+                        </p>
+                        <p className="text-xs text-emerald-400/70 mt-1 font-medium">Balance disponible</p>
                     </div>
-                    <p className={`text-xl font-bold mt-1 ${financeLoaded ? '' : 'animate-pulse bg-white/10 w-20 h-6 rounded'}`}>
-                        {financeLoaded ? (showBalance ? `Q${balance.toLocaleString()}` : '*******') : ''}
-                    </p>
-                    <p className="text-xs text-emerald-400 mt-2">Balance Actual</p>
                 </div>
-                <div className="glass-panel p-5 rounded-xl border-l-4 border-purple-500">
-                    <h3 className="text-slate-400 text-sm font-medium uppercase">Versículo del Día</h3>
-                    <p className="text-sm italic mt-1 text-slate-200">"{verse.text}"</p>
-                    <p className="text-xs text-purple-400 mt-2">{verse.citation}</p>
+
+                {/* Verse Card */}
+                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-purple-500/30 transition-all p-5">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                <Sparkles className="w-4 h-4 text-purple-400" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Versículo</span>
+                        </div>
+                        <p className="text-sm italic text-slate-300 leading-relaxed line-clamp-2">"{verse.text}"</p>
+                        <p className="text-xs text-purple-400/70 mt-2 font-semibold">{verse.citation}</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content (Modules) */}
-                <div className="lg:col-span-2 space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Area */}
+                <div className="lg:col-span-2 space-y-6">
                     {/* Modules */}
                     <div>
-                        <h3 className="text-xl font-bold text-slate-200 mb-4">Módulos</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <Target className="w-4 h-4" /> Módulos
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {features.map((feature, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => navigate(feature.path)}
-                                    className="glass-panel p-4 rounded-xl flex flex-col items-center justify-center gap-3 hover:bg-white/10 transition-all hover:-translate-y-1 group"
+                                    className={`group relative overflow-hidden rounded-xl bg-[#14161b] border border-white/5 hover:border-white/15 p-4 flex flex-col items-center gap-3 transition-all hover:-translate-y-1 hover:shadow-lg ${feature.shadow}`}
                                 >
-                                    <div className={`p-3 rounded-xl bg-white/5 group-hover:scale-110 transition-transform ${feature.color}`}>
-                                        <feature.icon className="w-6 h-6" />
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-[0.08] transition-opacity duration-500`} />
+                                    <div className={`relative z-10 w-10 h-10 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg ${feature.shadow} group-hover:scale-110 transition-transform duration-300`}>
+                                        <feature.icon className="w-5 h-5 text-white" />
                                     </div>
-                                    <span className="font-medium text-slate-300 text-sm">{feature.title}</span>
+                                    <span className="relative z-10 font-semibold text-slate-300 text-xs group-hover:text-white transition-colors">{feature.title}</span>
+                                    <ArrowUpRight className="absolute top-3 right-3 w-3 h-3 text-slate-600 opacity-0 group-hover:opacity-100 transition-all" />
                                 </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Quick External Links */}
-                    <div>
-                        <h3 className="text-xl font-bold text-slate-200 mb-4">Accesos Rápidos</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {externalLinks.map((link, idx) => (
-                                <a
-                                    key={idx}
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="glass-panel p-4 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-all group"
-                                >
-                                    <span className="text-2xl">{link.icon}</span>
-                                    <span className="font-medium text-slate-300 text-sm flex-1">{link.label}</span>
-                                    <ExternalLink className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                </a>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                {/* Sidebar (Reminders) */}
-                <div className="space-y-6">
-                    <div className="glass-panel p-6 rounded-xl h-full">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Bell className="w-5 h-5 text-amber-400" />
-                            <h3 className="text-lg font-bold text-slate-200">Recordatorios</h3>
+                {/* Sidebar */}
+                <div className="space-y-4">
+                    <div className="rounded-2xl bg-[#14161b] border border-white/5 p-5 h-full">
+                        <div className="flex items-center gap-2 mb-5">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                                <Bell className="w-4 h-4 text-amber-400" />
+                            </div>
+                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Recordatorios</h3>
                         </div>
 
-                        <div className="space-y-6">
-                            {/* Payments */}
+                        <div className="space-y-5">
+                            {/* Pending Payments */}
                             <div>
-                                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                                     <AlertCircle className="w-3 h-3" /> Pagos Pendientes
                                 </h4>
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     {pendingPayments.length === 0 ? (
-                                        <p className="text-sm text-slate-500 italic">Al día con tus pagos.</p>
+                                        <p className="text-xs text-slate-600 italic">Al día ✓</p>
                                     ) : (
                                         pendingPayments.slice(0, 3).map(p => (
-                                            <div key={p.id} className="flex justify-between items-center text-sm p-2 bg-white/5 rounded border-l-2 border-rose-500">
-                                                <span className="text-slate-300 truncate w-32" title={p.descripcion}>{p.descripcion}</span>
-                                                <span className="font-mono text-rose-400">Q{p.monto}</span>
+                                            <div key={p.id} className="flex justify-between items-center text-xs p-2.5 bg-white/[0.03] rounded-lg border-l-2 border-rose-500/60 hover:bg-white/[0.06] transition-colors">
+                                                <span className="text-slate-400 truncate max-w-[120px]" title={p.descripcion}>{p.descripcion}</span>
+                                                <span className="font-mono font-bold text-rose-400 text-[11px]">Q{p.monto}</span>
                                             </div>
                                         ))
                                     )}
-                                    {pendingPayments.length > 3 && <p className="text-xs text-center text-slate-500">y {pendingPayments.length - 3} más...</p>}
+                                    {pendingPayments.length > 3 && <p className="text-[10px] text-center text-slate-600">y {pendingPayments.length - 3} más...</p>}
                                 </div>
                             </div>
 
                             {/* Tasks & Goals */}
                             <div>
-                                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center gap-2">
+                                <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                                     <CheckCircle className="w-3 h-3" /> Tareas & Metas
                                 </h4>
-                                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+                                <div className="space-y-1.5 max-h-[350px] overflow-y-auto pr-1 custom-scrollbar">
                                     {tasks.length === 0 ? (
-                                        <p className="text-sm text-slate-500 italic">Todo completado.</p>
+                                        <p className="text-xs text-slate-600 italic">Todo completado ✓</p>
                                     ) : (
-                                        tasks.slice(0, 10).map((t, idx) => (
-                                            <div key={idx} className={`flex flex-col gap-1 text-sm p-3 bg-white/5 rounded border-l-2 ${t.source === 'plan' ? 'border-cyan-500' : 'border-indigo-500'}`}>
-                                                <div className="flex justify-between items-start">
-                                                    <span className="font-bold text-slate-200 line-clamp-1">{t.text}</span>
-                                                    <span className="text-xs text-slate-500 whitespace-nowrap">{t.date}</span>
+                                        tasks.slice(0, 8).map((t, idx) => (
+                                            <div key={idx} className={`flex flex-col gap-0.5 text-xs p-2.5 bg-white/[0.03] rounded-lg border-l-2 hover:bg-white/[0.06] transition-colors ${t.source === 'plan' ? 'border-cyan-500/60' : 'border-indigo-500/60'}`}>
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <span className="font-semibold text-slate-300 line-clamp-1 flex-1">{t.text}</span>
+                                                    <span className="text-[10px] text-slate-600 whitespace-nowrap">{t.date}</span>
                                                 </div>
                                                 {t.description && (
-                                                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{t.description}</p>
+                                                    <p className="text-[11px] text-slate-500 line-clamp-1">{t.description}</p>
                                                 )}
-                                                <span className={`text-[10px] uppercase font-bold mt-1 ${t.source === 'plan' ? 'text-cyan-400' : 'text-indigo-400'}`}>
-                                                    {t.source === 'plan' ? 'Meta Diaria' : 'Estudio'}
+                                                <span className={`text-[9px] uppercase font-black mt-0.5 ${t.source === 'plan' ? 'text-cyan-500/60' : 'text-indigo-500/60'}`}>
+                                                    {t.source === 'plan' ? 'Meta' : 'Estudio'}
                                                 </span>
                                             </div>
                                         ))

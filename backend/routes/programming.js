@@ -27,11 +27,11 @@ router.get('/', async (req, res) => {
             sectionsMap[sectionTitle].items.push({
                 id: g.id,
                 text: g.title,
-                type: g.start_date ? 'goal' : 'simple',
+                type: g.startDate ? 'goal' : 'simple',
                 completed: g.status === 'completed',
-                startDate: g.start_date,
-                endDate: g.end_date,
-                dailyLogs: g.logs ? JSON.parse(g.logs) : {}
+                startDate: g.startDate,
+                endDate: g.endDate,
+                dailyLogs: g.logs ? (typeof g.logs === 'string' ? JSON.parse(g.logs) : g.logs) : {}
             });
         });
 
