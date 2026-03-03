@@ -15,8 +15,8 @@ const PORT = 3001;
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Increased limit for large uploads (PDFs, JSONs)
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '200mb' })); // Increased limit for large uploads (PDFs, JSONs)
+app.use(express.urlencoded({ limit: '200mb', extended: true }));
 
 // Auth Routes
 app.use('/api/auth', authRoutes);
@@ -81,12 +81,14 @@ import scheduleRoutes from '../routes/schedule.js';
 import studyRoutes from '../routes/study.js';
 import devotionalRoutes from '../routes/devotional.js';
 import programmingRoutes from '../routes/programming.js';
+import quotesRoutes from '../routes/quotes.js';
 
 app.use('/api/finance', financeRoutes);
 app.use('/api/schedule', scheduleRoutes);
 app.use('/api/study', studyRoutes);
 app.use('/api/devotional', devotionalRoutes);
 app.use('/api/programming', programmingRoutes);
+app.use('/api/quotes', quotesRoutes);
 
 
 // 404 Handler for Debugging

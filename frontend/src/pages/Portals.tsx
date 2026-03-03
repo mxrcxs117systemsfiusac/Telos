@@ -1,5 +1,19 @@
-import { Wrench, Bot, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
-import { useState } from 'react';
+import { Wrench, Bot, ExternalLink, ArrowRight, BookOpen, Book, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+import { api } from '../utils/api';
+
+// Worker configuration
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+interface PdfResource {
+    id: number;
+    name: string;
+    url: string;
+    progress: number;
+}
 
 const EngineeringPage = () => {
     const links = [
@@ -43,7 +57,6 @@ const EngineeringPage = () => {
 };
 
 const AIPage = () => {
-    const [selectedAI, setSelectedAI] = useState<number | null>(null);
 
     const links = [
         { label: "Gemini", url: "https://gemini.google.com", icon: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg", desc: "Google's most capable AI model.", color: "from-blue-500 to-rose-500" },
@@ -69,8 +82,6 @@ const AIPage = () => {
                     <div
                         key={idx}
                         className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-white/20 transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10"
-                        onMouseEnter={() => setSelectedAI(idx)}
-                        onMouseLeave={() => setSelectedAI(null)}
                     >
                         <div className={`absolute inset-0 bg-gradient-to-br ${ai.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
 
@@ -104,6 +115,40 @@ const AIPage = () => {
 };
 
 const TheologyPage = () => {
+    const [pdfs, setPdfs] = useState<PdfResource[]>([]);
+    const [selectedPdf, setSelectedPdf] = useState<PdfResource | null>(null);
+    const [numPages, setNumPages] = useState<number | null>(null);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [scale, setScale] = useState(1.0);
+
+    useEffect(() => {
+        api.get('/study/pdfs')
+            .then(data => {
+                if (Array.isArray(data)) setPdfs(data);
+            })
+            .catch(console.error);
+    }, []);
+
+    const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+        setNumPages(numPages);
+        if (selectedPdf && selectedPdf.progress) {
+            setPageNumber(selectedPdf.progress);
+        } else {
+            setPageNumber(1);
+        }
+    };
+
+    const changePage = (offset: number) => {
+        setPageNumber(prev => {
+            const newPage = Math.min(Math.max(1, prev + offset), numPages || 1);
+            if (selectedPdf) {
+                api.put(`/study/pdfs/${selectedPdf.id}`, { progress: newPage });
+                setPdfs(curr => curr.map(p => p.id === selectedPdf.id ? { ...p, progress: newPage } : p));
+            }
+            return newPage;
+        });
+    };
+
     const links = [
         {
             label: "Google Drive",
@@ -133,7 +178,7 @@ const TheologyPage = () => {
                 <p className="text-slate-500 mt-2">Acceso rápido a recursos de Teología.</p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {links.map((link, idx) => (
                     <a
                         key={idx}
@@ -162,6 +207,51 @@ const TheologyPage = () => {
                         </div>
                     </a>
                 ))}
+            </div>
+
+            {/* PDF Library */}
+            <div className="flex-1 flex flex-col bg-[#1a1d24] rounded-xl border border-white/5 overflow-hidden min-h-[400px]">
+                <div className="px-5 py-3 border-b border-white/5 flex items-center gap-2">
+                    <Book className="w-4 h-4 text-amber-400" />
+                    <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca PDF</h3>
+                </div>
+
+                {!selectedPdf ? (
+                    <div className="flex-1 p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto content-start">
+                        {pdfs.length === 0 && <div className="col-span-full text-center text-slate-500 py-8">No hay PDFs. Súbelos desde Ajustes → Recursos Visuales.</div>}
+                        {pdfs.map((pdf, idx) => (
+                            <button key={idx} onClick={() => setSelectedPdf(pdf)} className="bg-white/5 p-6 rounded-xl border border-white/5 hover:bg-white/10 hover:border-amber-500/50 transition-all flex flex-col items-center text-center gap-3 group h-40 justify-center">
+                                <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform"><Book className="w-6 h-6" /></div>
+                                <span className="text-sm font-medium text-slate-300 line-clamp-2">{pdf.name}</span>
+                                {pdf.progress > 1 && <span className="text-xs text-emerald-400">Pág. {pdf.progress}</span>}
+                            </button>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                        <div className="flex items-center justify-between p-3 bg-black/20 border-b border-white/5 shrink-0">
+                            <button onClick={() => setSelectedPdf(null)} className="text-slate-400 hover:text-white flex items-center gap-1 text-sm"><ChevronLeft className="w-4 h-4" /> Volver</button>
+                            <span className="text-sm font-bold text-slate-200 truncate max-w-[200px]">{selectedPdf.name}</span>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="p-1.5 hover:bg-white/10 rounded"><ZoomOut className="w-4 h-4 text-slate-400" /></button>
+                                <span className="text-xs text-slate-400 w-8 text-center">{Math.round(scale * 100)}%</span>
+                                <button onClick={() => setScale(s => Math.min(2.0, s + 0.1))} className="p-1.5 hover:bg-white/10 rounded"><ZoomIn className="w-4 h-4 text-slate-400" /></button>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-auto bg-[#525659] flex justify-center p-4">
+                            <Document file={`http://localhost:3001${selectedPdf.url}`} onLoadSuccess={onDocumentLoadSuccess}>
+                                <Page pageNumber={pageNumber} scale={scale} renderTextLayer={false} renderAnnotationLayer={false} className="shadow-2xl" />
+                            </Document>
+                        </div>
+                        {numPages && (
+                            <div className="p-3 bg-black/20 border-t border-white/5 flex justify-center items-center gap-4 shrink-0">
+                                <button onClick={() => changePage(-1)} disabled={pageNumber <= 1} className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"><ChevronLeft className="w-5 h-5 text-white" /></button>
+                                <span className="text-sm text-slate-300">Página {pageNumber} de {numPages}</span>
+                                <button onClick={() => changePage(1)} disabled={pageNumber >= numPages} className="p-2 hover:bg-white/10 rounded-full disabled:opacity-30"><ChevronRight className="w-5 h-5 text-white" /></button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

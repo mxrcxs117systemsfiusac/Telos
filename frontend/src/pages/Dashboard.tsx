@@ -4,7 +4,7 @@ import {
     Wallet, Calendar, Wrench,
     Code, GraduationCap, BookOpen,
     Bell, CheckCircle, AlertCircle, Eye, EyeOff,
-    ArrowUpRight, TrendingUp, Sparkles, Target, Clock
+    ArrowUpRight, TrendingUp, Sparkles, Target, Clock, Heart
 } from 'lucide-react';
 import { useFinance } from '../hooks/useFinance';
 import { api } from '../utils/api';
@@ -15,6 +15,7 @@ export default function Dashboard() {
 
     const [tasks, setTasks] = useState<{ id: number, text: string, description?: string, date: string, source: 'study' | 'plan', completed?: boolean }[]>([]);
     const [verse, setVerse] = useState<{ text: string, citation: string }>({ text: "Cargando...", citation: "" });
+    const [quote, setQuote] = useState<{ text: string, author: string }>({ text: "Cargando...", author: "" });
     const [showBalance, setShowBalance] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -101,12 +102,34 @@ export default function Dashboard() {
             .catch(() => {
                 setVerse({ text: "Error cargando versículos.", citation: "Intenta recargar." });
             });
+
+        // Fetch motivational quotes
+        api.get('/quotes')
+            .then(data => {
+                const entries = data.entries || [];
+                if (entries.length > 0) {
+                    const random = entries[Math.floor(Math.random() * entries.length)];
+                    setQuote({ text: random.text || "", author: random.author || "" });
+                    if (entries.length > 1) {
+                        const interval = setInterval(() => {
+                            const nextRandom = entries[Math.floor(Math.random() * entries.length)];
+                            setQuote({ text: nextRandom.text || "", author: nextRandom.author || "" });
+                        }, 30000);
+                        return () => clearInterval(interval);
+                    }
+                } else {
+                    setQuote({ text: "No hay frases guardadas aún.", author: "Ve a Ajustes para agregar." });
+                }
+            })
+            .catch(() => {
+                setQuote({ text: "Error cargando frases.", author: "Intenta recargar." });
+            });
     }, []);
 
     const features = [
         { title: "Billetera", icon: Wallet, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/20", path: "/wallet" },
         { title: "Horario", icon: Calendar, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/20", path: "/schedule" },
-        { title: "Estudio", icon: GraduationCap, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/20", path: "/study" },
+        { title: "Tareas", icon: GraduationCap, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/20", path: "/study" },
         { title: "Ingeniería", icon: Wrench, gradient: "from-slate-400 to-slate-600", shadow: "shadow-slate-500/20", path: "/engineering" },
         { title: "Teología", icon: BookOpen, gradient: "from-amber-400 to-yellow-600", shadow: "shadow-amber-400/20", path: "/theology" },
         { title: "Plan", icon: Code, gradient: "from-cyan-500 to-blue-600", shadow: "shadow-cyan-500/20", path: "/programming" },
@@ -151,7 +174,7 @@ export default function Dashboard() {
             </header>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Finance Card */}
                 <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-emerald-500/30 transition-all p-5">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -186,6 +209,21 @@ export default function Dashboard() {
                         </div>
                         <p className="text-sm italic text-slate-300 leading-relaxed line-clamp-2">"{verse.text}"</p>
                         <p className="text-xs text-purple-400/70 mt-2 font-semibold">{verse.citation}</p>
+                    </div>
+                </div>
+
+                {/* Motivational Quote Card */}
+                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-rose-500/30 transition-all p-5">
+                    <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
+                                <Heart className="w-4 h-4 text-rose-400" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Frase del día</span>
+                        </div>
+                        <p className="text-sm italic text-slate-300 leading-relaxed line-clamp-2">"{quote.text}"</p>
+                        <p className="text-xs text-rose-400/70 mt-2 font-semibold">{quote.author}</p>
                     </div>
                 </div>
             </div>
@@ -267,7 +305,7 @@ export default function Dashboard() {
                                                     <p className="text-[11px] text-slate-500 line-clamp-1">{t.description}</p>
                                                 )}
                                                 <span className={`text-[9px] uppercase font-black mt-0.5 ${t.source === 'plan' ? 'text-cyan-500/60' : 'text-indigo-500/60'}`}>
-                                                    {t.source === 'plan' ? 'Meta' : 'Estudio'}
+                                                    {t.source === 'plan' ? 'Meta' : 'Tarea'}
                                                 </span>
                                             </div>
                                         ))

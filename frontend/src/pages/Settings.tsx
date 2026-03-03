@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Upload, Image, FileText, Database, Check, Trash2, User, Settings } from 'lucide-react';
+import { Upload, Image, FileText, Database, Check, Trash2, User, Settings, Heart } from 'lucide-react';
 import { api } from '../utils/api';
 
 const FILE_BASE_URL = 'http://localhost:3001';
@@ -37,6 +37,7 @@ export default function SettingsPage() {
 
     // State for Data Status
     const [hasVerses, setHasVerses] = useState(false);
+    const [hasQuotes, setHasQuotes] = useState(false);
 
     // State for Image Upload
     const [uploadingImg, setUploadingImg] = useState(false);
@@ -57,6 +58,10 @@ export default function SettingsPage() {
 
         api.get('/study/pdfs').then(data => {
             if (Array.isArray(data)) setPdfs(data);
+        }).catch(() => { });
+
+        api.get('/quotes').then(data => {
+            if (data.entries?.length > 0) setHasQuotes(true);
         }).catch(() => { });
     }, [activeTab]);
 
@@ -303,15 +308,68 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
+                            {/* Manual Quote Add */}
+                            <div className="glass-panel p-6 rounded-xl relative overflow-hidden group">
+                                <h3 className="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <Heart className="text-rose-400" /> Agregar Frase Motivadora
+                                </h3>
+
+                                <form onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const form = e.target as HTMLFormElement;
+                                    const text = (form.elements.namedItem('quoteText') as HTMLInputElement).value;
+                                    const author = (form.elements.namedItem('quoteAuthor') as HTMLInputElement).value;
+
+                                    if (!text) return;
+
+                                    try {
+                                        await api.post('/quotes', { text, author });
+                                        showStatus('Frase motivadora agregada correctamente');
+                                        form.reset();
+                                        setHasQuotes(true);
+                                    } catch (err) { showStatus('Error de conexión', true); }
+                                }} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Frase</label>
+                                        <textarea name="quoteText" placeholder="Ej. Sé el hombre que ella merece..." className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-slate-200 focus:border-rose-500 outline-none h-24 resize-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Autor (opcional)</label>
+                                        <input name="quoteAuthor" placeholder="Ej. Anónimo" className="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-slate-200 focus:border-rose-500 outline-none" />
+                                    </div>
+                                    <button type="submit" className="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-4 rounded-lg w-full transition-colors">
+                                        Guardar Frase
+                                    </button>
+                                </form>
+
+                                {/* Quote List */}
+                                <div className="mt-6 border-t border-white/10 pt-4">
+                                    <h4 className="text-sm font-bold text-slate-400 mb-3 uppercase">Frases Guardadas</h4>
+                                    <QuoteList hasQuotes={hasQuotes} setHasQuotes={setHasQuotes} showStatus={showStatus} />
+                                </div>
+                            </div>
+
                             {/* Reset Zone */}
                             <div className="glass-panel p-6 rounded-xl border border-rose-500/20">
                                 <h3 className="text-lg font-bold text-rose-400 mb-4 flex items-center gap-2">
                                     <Trash2 className="w-5 h-5" /> Zona de Peligro
                                 </h3>
                                 <p className="text-sm text-slate-400 mb-4">Estas acciones no se pueden deshacer.</p>
-                                <button onClick={() => handleReset('verses')} className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/50 py-2 px-4 rounded-lg transition-colors font-medium">
-                                    Borrar todos los versículos
-                                </button>
+                                <div className="space-y-2">
+                                    <button onClick={() => handleReset('verses')} className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/50 py-2 px-4 rounded-lg transition-colors font-medium">
+                                        Borrar todos los versículos
+                                    </button>
+                                    <button onClick={async () => {
+                                        if (!confirm('¿Estás seguro de eliminar todas las frases motivadoras?')) return;
+                                        try {
+                                            await api.delete('/quotes');
+                                            setHasQuotes(false);
+                                            showStatus('Frases eliminadas');
+                                        } catch { showStatus('Error al eliminar', true); }
+                                    }} className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/50 py-2 px-4 rounded-lg transition-colors font-medium">
+                                        Borrar todas las frases motivadoras
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -427,6 +485,52 @@ function VerseList({ hasVerses, setHasVerses, showStatus }: { hasVerses: boolean
                         <p className="text-xs text-slate-300 line-clamp-2">{v.text}</p>
                     </div>
                     <button onClick={() => handleDelete(v.id)} className="text-slate-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function QuoteList({ hasQuotes, setHasQuotes, showStatus }: { hasQuotes: boolean, setHasQuotes: (v: boolean) => void, showStatus: (msg: string, err?: boolean) => void }) {
+    const [quotes, setQuotes] = useState<any[]>([]);
+
+    const fetchQuotes = () => {
+        api.get('/quotes')
+            .then(data => {
+                if (data.entries) {
+                    setQuotes(data.entries);
+                    setHasQuotes(data.entries.length > 0);
+                }
+            })
+            .catch(console.error);
+    };
+
+    useEffect(() => {
+        fetchQuotes();
+    }, [hasQuotes]);
+
+    const handleDelete = async (id: number) => {
+        if (!confirm('Eliminar esta frase?')) return;
+        try {
+            await api.delete(`/quotes/${id}`);
+            showStatus('Frase eliminada');
+            fetchQuotes();
+        } catch (e) { showStatus('Error de conexión', true); }
+    };
+
+    if (quotes.length === 0) return <p className="text-xs text-slate-500 italic">No hay frases guardadas.</p>;
+
+    return (
+        <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+            {quotes.map((q: any) => (
+                <div key={q.id} className="bg-black/20 p-3 rounded-lg border border-white/5 flex justify-between items-start group">
+                    <div>
+                        {q.author && <p className="text-xs font-bold text-rose-400 mb-1">{q.author}</p>}
+                        <p className="text-xs text-slate-300 line-clamp-2">{q.text}</p>
+                    </div>
+                    <button onClick={() => handleDelete(q.id)} className="text-slate-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Trash2 className="w-4 h-4" />
                     </button>
                 </div>

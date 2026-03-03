@@ -16,7 +16,7 @@ export default function DashboardLayout() {
         { to: "/", icon: LayoutDashboard, label: "Dashboard" },
         { to: "/wallet", icon: Wallet, label: "Billetera" },
         { to: "/schedule", icon: Calendar, label: "Horario" },
-        { to: "/study", icon: Book, label: "Estudio" },
+        { to: "/study", icon: Book, label: "Tareas" },
         { to: "/engineering", icon: Wrench, label: "Ingeniería" },
         { to: "/theology", icon: BookOpen, label: "Teología" },
         { to: "/programming", icon: Code, label: "Plan" },

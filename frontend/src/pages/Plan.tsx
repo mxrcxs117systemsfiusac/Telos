@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Code, CheckSquare, Plus, Trash2, FolderPlus, X, Save, FileText } from 'lucide-react';
+import { Code, CheckSquare, Plus, Trash2, FolderPlus, X, Save, FileText, Pencil, Check } from 'lucide-react';
 import { api } from '../utils/api';
 
 interface DailyLog {
@@ -46,6 +46,10 @@ export default function PlanPage() {
     // Modal State
     const [logModal, setLogModal] = useState<LogModalData | null>(null);
 
+    // Section Editing State
+    const [editingSectionId, setEditingSectionId] = useState<number | null>(null);
+    const [editingSectionTitle, setEditingSectionTitle] = useState('');
+
     useEffect(() => {
         api.get('/programming')
             .then(data => {
@@ -81,6 +85,26 @@ export default function PlanPage() {
     const deleteSection = (id: number) => {
         if (!confirm('Eliminar sección?')) return;
         saveSections(sections.filter(s => s.id !== id));
+    };
+
+    const startEditingSection = (section: Section) => {
+        setEditingSectionId(section.id);
+        setEditingSectionTitle(section.title);
+    };
+
+    const saveEditingSection = () => {
+        if (!editingSectionId || !editingSectionTitle.trim()) return;
+        const updated = sections.map(s =>
+            s.id === editingSectionId ? { ...s, title: editingSectionTitle.trim() } : s
+        );
+        saveSections(updated);
+        setEditingSectionId(null);
+        setEditingSectionTitle('');
+    };
+
+    const cancelEditingSection = () => {
+        setEditingSectionId(null);
+        setEditingSectionTitle('');
     };
 
     const getMonthsBetween = (start: string, end: string) => {
@@ -294,7 +318,33 @@ export default function PlanPage() {
                 {sections.map(section => (
                     <div key={section.id} className="glass-panel p-5 rounded-xl flex flex-col gap-4 border-t-4 border-emerald-500">
                         <div className="flex justify-between items-center">
-                            <h3 className="font-bold text-lg text-slate-200">{section.title}</h3>
+                            {editingSectionId === section.id ? (
+                                <div className="flex items-center gap-2 flex-1">
+                                    <input
+                                        className="bg-black/30 border border-emerald-500/50 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none flex-1"
+                                        value={editingSectionTitle}
+                                        onChange={e => setEditingSectionTitle(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') saveEditingSection();
+                                            if (e.key === 'Escape') cancelEditingSection();
+                                        }}
+                                        autoFocus
+                                    />
+                                    <button onClick={saveEditingSection} className="text-emerald-400 hover:text-emerald-300 p-1">
+                                        <Check className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={cancelEditingSection} className="text-slate-500 hover:text-slate-300 p-1">
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <h3 className="font-bold text-lg text-slate-200" onDoubleClick={() => startEditingSection(section)}>{section.title}</h3>
+                                    <button onClick={() => startEditingSection(section)} className="text-slate-600 hover:text-emerald-400 transition-colors" title="Editar nombre">
+                                        <Pencil className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            )}
                             <button onClick={() => deleteSection(section.id)} className="text-slate-600 hover:text-rose-400">
                                 <Trash2 className="w-4 h-4" />
                             </button>
