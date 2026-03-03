@@ -3,7 +3,7 @@ import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard, Wallet, Calendar, Book, Wrench,
-    Code, Menu, Settings, LogOut, BookOpen, X
+    Code, Menu, Settings, LogOut, BookOpen, X, Heart
 } from 'lucide-react';
 
 export default function DashboardLayout() {
@@ -20,6 +20,7 @@ export default function DashboardLayout() {
         { to: "/engineering", icon: Wrench, label: "Ingeniería" },
         { to: "/theology", icon: BookOpen, label: "Teología" },
         { to: "/programming", icon: Code, label: "Plan" },
+        { to: "/josselin", icon: Heart, label: "Josselin" },
         { to: "/settings", icon: Settings, label: "Ajustes" },
     ];
 
@@ -92,7 +93,7 @@ export default function DashboardLayout() {
                         <LogOut className="w-[18px] h-[18px] transition-transform group-hover:-translate-x-0.5" />
                         Cerrar Sesión
                     </button>
-                    <div className="text-[10px] text-center text-slate-700 mt-1">v3.1 &bull; Telos</div>
+                    <div className="text-[10px] text-center text-slate-700 mt-1">v3.2 &bull; Telos</div>
                 </div>
             </aside>
 

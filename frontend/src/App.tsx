@@ -12,6 +12,7 @@ import StudyPage from './pages/Study';
 
 import { EngineeringPage, AIPage, TheologyPage } from './pages/Portals';
 import PlanPage from './pages/Plan';
+import JosselinPage from './pages/Josselin';
 
 import SettingsPage from './pages/Settings';
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="ai" element={<AIPage />} />
             <Route path="theology" element={<TheologyPage />} />
             <Route path="programming" element={<PlanPage />} />
+            <Route path="josselin" element={<JosselinPage />} />
             <Route path="settings" element={<SettingsPage />} />
 
           </Route>

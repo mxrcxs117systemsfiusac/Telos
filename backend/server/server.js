@@ -82,6 +82,9 @@ import studyRoutes from '../routes/study.js';
 import devotionalRoutes from '../routes/devotional.js';
 import programmingRoutes from '../routes/programming.js';
 import quotesRoutes from '../routes/quotes.js';
+import theologyRoutes from '../routes/theology.js';
+import josselinRoutes from '../routes/josselin.js';
+import engineeringRoutes from '../routes/engineering.js';
 
 app.use('/api/finance', financeRoutes);
 app.use('/api/schedule', scheduleRoutes);
@@ -89,6 +92,9 @@ app.use('/api/study', studyRoutes);
 app.use('/api/devotional', devotionalRoutes);
 app.use('/api/programming', programmingRoutes);
 app.use('/api/quotes', quotesRoutes);
+app.use('/api/theology', theologyRoutes);
+app.use('/api/josselin', josselinRoutes);
+app.use('/api/engineering', engineeringRoutes);
 
 
 // 404 Handler for Debugging
