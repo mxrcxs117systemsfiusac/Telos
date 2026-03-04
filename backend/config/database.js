@@ -1,17 +1,21 @@
 import { Sequelize } from 'sequelize';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
-// DB Path: backend/data/telos.sqlite
-const dbPath = path.join(__dirname, '../data/telos.sqlite');
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL no está definida en las variables de entorno');
+}
 
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: dbPath,
-    logging: false
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 export default sequelize;

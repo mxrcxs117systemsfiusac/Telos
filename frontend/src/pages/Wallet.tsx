@@ -18,16 +18,6 @@ export default function WalletPage() {
         () => sessionStorage.getItem('wallet_unlocked') === 'true'
     );
 
-    if (!walletUnlocked) {
-        return (
-            <WalletLock
-                onUnlock={() => {
-                    sessionStorage.setItem('wallet_unlocked', 'true');
-                    setWalletUnlocked(true);
-                }}
-            />
-        );
-    }
     const {
         ingresos, egresos, pagos, plannedIncomes,
         metaAhorro, setMetaAhorro,
@@ -41,6 +31,17 @@ export default function WalletPage() {
     const [modalTypeExtended, setModalTypeExtended] = useState<'ingreso' | 'egreso' | 'pago' | 'planned' | null>(null);
     const [editingItem, setEditingItem] = useState<Transaction | null>(null);
     const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'planning', 'fixed'
+
+    if (!walletUnlocked) {
+        return (
+            <WalletLock
+                onUnlock={() => {
+                    sessionStorage.setItem('wallet_unlocked', 'true');
+                    setWalletUnlocked(true);
+                }}
+            />
+        );
+    }
 
     const handleSaveExtended = (descripcion: string, monto: number, categoria: string, fecha: string) => {
         if (modalTypeExtended) {
