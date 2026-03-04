@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001/api';
+const BASE_URL = 'https://telos-dxux.onrender.com/api';
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
