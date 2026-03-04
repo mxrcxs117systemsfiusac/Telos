@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 
@@ -24,6 +24,7 @@ export const useFinance = () => {
   const [ahorroActual, setAhorroActual] = useState<number>(0);
   const [savingsImage, setSavingsImage] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
     if (!token) return;
@@ -38,9 +39,29 @@ export const useFinance = () => {
         setAhorroActual(data.ahorroActual || 0);
         setSavingsImage(data.savingsImage || null);
         setIsLoaded(true);
+        // Mark initial load complete after state settles
+        setTimeout(() => { isInitialLoad.current = false; }, 100);
       })
       .catch(err => console.error('Error loading finance data', err));
   }, [token]);
+
+  // Debounced persistence for metaAhorro
+  useEffect(() => {
+    if (isInitialLoad.current || !isLoaded) return;
+    const timer = setTimeout(() => {
+      api.post('/finance', { metaAhorro }).catch(console.error);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [metaAhorro]);
+
+  // Debounced persistence for ahorroActual
+  useEffect(() => {
+    if (isInitialLoad.current || !isLoaded) return;
+    const timer = setTimeout(() => {
+      api.post('/finance', { ahorroActual }).catch(console.error);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [ahorroActual]);
 
   const mapTypeToDB = (type: string) => {
     if (type === 'ingreso') return 'income';

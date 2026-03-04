@@ -10,9 +10,24 @@ import { ExpenseChart } from '../components/ExpenseChart';
 import { BankShortcuts } from '../components/BankShortcuts';
 import { IncomePlanning } from '../components/IncomePlanning';
 import { FixedPaymentsList } from '../components/FixedPaymentsList';
+import WalletLock from '../components/WalletLock';
 
 
 export default function WalletPage() {
+    const [walletUnlocked, setWalletUnlocked] = useState(
+        () => sessionStorage.getItem('wallet_unlocked') === 'true'
+    );
+
+    if (!walletUnlocked) {
+        return (
+            <WalletLock
+                onUnlock={() => {
+                    sessionStorage.setItem('wallet_unlocked', 'true');
+                    setWalletUnlocked(true);
+                }}
+            />
+        );
+    }
     const {
         ingresos, egresos, pagos, plannedIncomes,
         metaAhorro, setMetaAhorro,

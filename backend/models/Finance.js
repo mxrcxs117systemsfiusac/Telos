@@ -7,7 +7,7 @@ const FinanceItem = sequelize.define('FinanceItem', {
         allowNull: false
     },
     type: {
-        type: DataTypes.ENUM('income', 'expense', 'saving', 'payment', 'planned_income', 'planned_expense'),
+        type: DataTypes.ENUM('income', 'expense', 'saving', 'payment', 'planned_income', 'planned_expense', 'savings_meta', 'savings_image_url'),
         allowNull: false
     },
     amount: {

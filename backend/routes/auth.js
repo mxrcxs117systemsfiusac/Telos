@@ -58,6 +58,29 @@ router.get('/me', (req, res) => {
     }
 });
 
+// Verify Password (for Wallet Lock)
+router.post('/verify-password', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) return res.status(401).json({ error: 'No token' });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+
+        const { password } = req.body;
+        if (!password) return res.status(400).json({ error: 'Password required' });
+
+        const user = await User.findByPk(decoded.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) return res.status(401).json({ error: 'Invalid password' });
+
+        res.json({ verified: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 // Update Profile
 router.post('/update-profile', async (req, res) => {
     try {

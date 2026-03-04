@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Upload, Image, FileText, Database, Check, Trash2, User, Settings, Heart } from 'lucide-react';
+import { Upload, Image, FileText, Database, Check, Trash2, User, Settings, Heart, BookOpen } from 'lucide-react';
 import { api } from '../utils/api';
 
 const FILE_BASE_URL = 'http://localhost:3001';
@@ -43,6 +43,8 @@ export default function SettingsPage() {
     const [uploadingImg, setUploadingImg] = useState(false);
     const [savingsImage, setSavingsImage] = useState<string | null>(null);
     const [pdfs, setPdfs] = useState<{ name: string, url: string }[]>([]);
+    const [albumImages, setAlbumImages] = useState<{ name: string, url: string }[]>([]);
+    const [uploadingAlbum, setUploadingAlbum] = useState(false);
 
     useEffect(() => {
         // Check status on load
@@ -63,6 +65,12 @@ export default function SettingsPage() {
         api.get('/quotes').then(data => {
             if (data.entries?.length > 0) setHasQuotes(true);
         }).catch(() => { });
+
+        // Album images
+        fetch('http://localhost:3001/api/josselin/album')
+            .then(r => r.json())
+            .then(data => { if (Array.isArray(data)) setAlbumImages(data); })
+            .catch(() => { });
     }, [activeTab]);
 
     // Helpers
@@ -431,6 +439,75 @@ export default function SettingsPage() {
                                                     <span className="text-sm text-slate-300 truncate max-w-[200px]" title={pdf.name}>{pdf.name}</span>
                                                     <button onClick={() => handleDeletePdf(pdf.name)} className="text-rose-400 hover:text-rose-300 p-1 rounded-md hover:bg-white/10">
                                                         <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Album Josselin */}
+                            <div className="glass-panel p-6 rounded-xl">
+                                <h3 className="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <BookOpen className="text-fuchsia-400" /> Álbum Josselin
+                                </h3>
+                                <p className="text-sm text-slate-400 mb-4">Sube fotos para el librito virtual de Josselin. Aparecerán en la pestaña "Álbum" del módulo.</p>
+                                <label className="block w-full p-8 border-2 border-dashed border-white/10 rounded-xl hover:border-fuchsia-500/50 hover:bg-white/5 transition-all cursor-pointer text-center">
+                                    <input type="file" accept="image/*" className="hidden" multiple onChange={async (e) => {
+                                        const files = e.target.files;
+                                        if (!files || files.length === 0) return;
+                                        setUploadingAlbum(true);
+                                        for (const file of Array.from(files)) {
+                                            const reader = new FileReader();
+                                            await new Promise<void>((resolve) => {
+                                                reader.onload = async () => {
+                                                    try {
+                                                        const res = await fetch('http://localhost:3001/api/josselin/album', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ name: file.name, data: reader.result })
+                                                        });
+                                                        const json = await res.json();
+                                                        if (json.success) {
+                                                            setAlbumImages(prev => [...prev, { name: json.name, url: json.url }]);
+                                                        }
+                                                    } catch { }
+                                                    resolve();
+                                                };
+                                                reader.readAsDataURL(file);
+                                            });
+                                        }
+                                        setUploadingAlbum(false);
+                                        showStatus(`${files.length} imagen(es) subida(s) al álbum`);
+                                        e.target.value = '';
+                                    }} />
+                                    <div className="flex flex-col items-center gap-2 text-slate-400">
+                                        <Upload className="w-8 h-8" />
+                                        <span>{uploadingAlbum ? 'Subiendo...' : 'Click para subir imágenes al álbum'}</span>
+                                        <span className="text-xs text-slate-600">Puedes seleccionar múltiples archivos</span>
+                                    </div>
+                                </label>
+
+                                {albumImages.length > 0 && (
+                                    <div className="mt-6 space-y-3">
+                                        <h4 className="text-sm font-semibold text-slate-400">Imágenes en el álbum ({albumImages.length})</h4>
+                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                            {albumImages.map(img => (
+                                                <div key={img.name} className="relative group rounded-xl overflow-hidden border border-white/5 aspect-square">
+                                                    <img src={`http://localhost:3001${img.url}`} alt={img.name} className="w-full h-full object-cover" />
+                                                    <button
+                                                        onClick={async () => {
+                                                            if (!confirm('¿Eliminar esta imagen del álbum?')) return;
+                                                            try {
+                                                                await fetch(`http://localhost:3001/api/josselin/album/${img.name}`, { method: 'DELETE' });
+                                                                setAlbumImages(prev => prev.filter(i => i.name !== img.name));
+                                                                showStatus('Imagen eliminada del álbum');
+                                                            } catch { showStatus('Error al eliminar', true); }
+                                                        }}
+                                                        className="absolute top-1 right-1 p-1 rounded-md bg-black/60 text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
                                                 </div>
                                             ))}
