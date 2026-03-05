@@ -72,8 +72,16 @@ router.post('/verify-password', async (req, res) => {
         const user = await User.findByPk(decoded.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
 
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) return res.status(401).json({ error: 'Invalid password' });
+        if (user.wallet_password_hash) {
+            // User has set a custom wallet password
+            const isMatch = await bcrypt.compare(password, user.wallet_password_hash);
+            if (!isMatch) return res.status(401).json({ error: 'Invalid password' });
+        } else {
+            // User falls back to the default wallet password
+            if (password !== 'Cortana117') {
+                return res.status(401).json({ error: 'Invalid password' });
+            }
+        }
 
         res.json({ verified: true });
     } catch (error) {
@@ -89,7 +97,7 @@ router.post('/update-profile', async (req, res) => {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, SECRET_KEY);
 
-        const { username, password } = req.body;
+        const { username, password, walletPassword } = req.body;
         const user = await User.findByPk(decoded.id);
 
         if (!user) return res.status(404).json({ error: 'User not found' });
@@ -97,6 +105,9 @@ router.post('/update-profile', async (req, res) => {
         if (username) user.username = username;
         if (password) {
             user.password_hash = await bcrypt.hash(password, 10);
+        }
+        if (walletPassword) {
+            user.wallet_password_hash = await bcrypt.hash(walletPassword, 10);
         }
 
         await user.save();

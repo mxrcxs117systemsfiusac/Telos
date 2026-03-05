@@ -13,23 +13,34 @@ export default function SettingsPage() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    // State for Wallet Password
+    const [walletPassword, setWalletPassword] = useState('');
+    const [confirmWalletPassword, setConfirmWalletPassword] = useState('');
+
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         if (password && password !== confirmPassword) {
-            showStatus('Las contraseñas no coinciden', true);
+            showStatus('Las contraseñas de inicio de sesión no coinciden', true);
+            return;
+        }
+        if (walletPassword && walletPassword !== confirmWalletPassword) {
+            showStatus('Las contraseñas de la billetera no coinciden', true);
             return;
         }
 
         try {
             const data = await api.post('/auth/update-profile', {
                 username: username || undefined,
-                password: password || undefined
+                password: password || undefined,
+                walletPassword: walletPassword || undefined
             });
 
             if (data.token) localStorage.setItem('token', data.token);
             showStatus('Perfil actualizado correctamente');
             setPassword('');
             setConfirmPassword('');
+            setWalletPassword('');
+            setConfirmWalletPassword('');
         } catch (err: any) {
             showStatus(err.message || 'Error al actualizar', true);
         }
@@ -257,7 +268,7 @@ export default function SettingsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-400 mb-1">Confirmar Contraseña</label>
+                                    <label className="block text-sm font-medium text-slate-400 mb-1">Confirmar Contraseña de Inicio</label>
                                     <input
                                         type="password"
                                         value={confirmPassword}
@@ -266,7 +277,32 @@ export default function SettingsPage() {
                                         className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-indigo-500"
                                     />
                                 </div>
-                                <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                                <div className="pt-4 border-t border-white/10">
+                                    <h4 className="text-sm font-bold text-slate-300 mb-3">Contraseña de Billetera</h4>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-400 mb-1">Nueva Contraseña de Billetera</label>
+                                            <input
+                                                type="password"
+                                                value={walletPassword}
+                                                onChange={e => setWalletPassword(e.target.value)}
+                                                placeholder="••••••••"
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-emerald-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-400 mb-1">Confirmar Contraseña de Billetera</label>
+                                            <input
+                                                type="password"
+                                                value={confirmWalletPassword}
+                                                onChange={e => setConfirmWalletPassword(e.target.value)}
+                                                placeholder="••••••••"
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-emerald-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
                                     Guardar Cambios
                                 </button>
                             </form>

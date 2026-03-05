@@ -15,6 +15,10 @@ const User = sequelize.define('User', {
     password_hash: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    wallet_password_hash: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     timestamps: true

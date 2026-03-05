@@ -53,8 +53,9 @@ export default function WalletLock({ onUnlock }: WalletLockProps) {
                         </div>
                     </div>
                     <h2 className="text-xl font-bold text-white tracking-tight">Billetera Protegida</h2>
-                    <p className="text-slate-500 text-sm mt-1.5 text-center">
-                        Ingresa tu contraseña para acceder a tu información financiera
+                    <p className="text-slate-500 text-sm mt-1.5 text-center px-4">
+                        Ingresa la contraseña de la billetera para acceder a tu información financiera
+                        <br /><span className="text-xs text-indigo-400 opacity-80 mt-1 block">(Predeterminada: Cortana117)</span>
                     </p>
                 </div>
 
