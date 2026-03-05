@@ -109,10 +109,6 @@ export default function WalletLock({ onUnlock }: WalletLockProps) {
                         )}
                     </button>
                 </form>
-
-                <p className="text-slate-600 text-xs text-center mt-6">
-                    Utiliza la misma contraseña de tu cuenta
-                </p>
             </div>
 
             {/* CSS for shake animation */}

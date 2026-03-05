@@ -11,6 +11,7 @@ import MotivationalQuote from './MotivationalQuote.js';
 import ZoomLink from './ZoomLink.js';
 import JosselinEntry from './JosselinEntry.js';
 import MeetLink from './MeetLink.js';
+import JosselinPlan from './JosselinPlan.js';
 
 // Define Associations
 const models = {
@@ -25,7 +26,8 @@ const models = {
     MotivationalQuote,
     ZoomLink,
     JosselinEntry,
-    MeetLink
+    MeetLink,
+    JosselinPlan
 };
 
 // User Associations
@@ -62,5 +64,8 @@ JosselinEntry.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(MeetLink, { foreignKey: 'user_id' });
 MeetLink.belongsTo(User, { foreignKey: 'user_id' });
 
-export { sequelize, User, FinanceItem, ScheduleEvent, Task, DevotionalEntry, Resource, Concept, Goal, MotivationalQuote, ZoomLink, JosselinEntry, MeetLink };
+User.hasMany(JosselinPlan, { foreignKey: 'user_id' });
+JosselinPlan.belongsTo(User, { foreignKey: 'user_id' });
+
+export { sequelize, User, FinanceItem, ScheduleEvent, Task, DevotionalEntry, Resource, Concept, Goal, MotivationalQuote, ZoomLink, JosselinEntry, MeetLink, JosselinPlan };
 export default models;

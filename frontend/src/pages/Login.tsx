@@ -44,41 +44,42 @@ export default function Login() {
                 </div>
 
                 {error && (
-                    <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center font-medium animate-pulse">
+                    <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-sm text-center font-medium animate-slide-down flex items-center justify-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-slate-300 ml-1">Usuario</label>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-slate-400 mx-1">Usuario</label>
                         <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
                                 <User className="w-5 h-5" />
                             </div>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-[#0a0c10] border border-white/10 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 outline-none transition-all text-white placeholder-slate-600"
-                                placeholder="           "
+                                className="w-full bg-[#0a0c10] border border-white/5 rounded-xl py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 hover:border-white/10 outline-none transition-all text-white placeholder-slate-600 shadow-inner"
+                                placeholder="..."
                                 required
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-slate-300 ml-1">Contraseña</label>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-slate-400 mx-1">Contraseña</label>
                         <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-purple-400 transition-colors">
                                 <Lock className="w-5 h-5" />
                             </div>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-[#0a0c10] border border-white/10 rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 outline-none transition-all text-white placeholder-slate-600"
-                                placeholder="•••••••••••••"
+                                className="w-full bg-[#0a0c10] border border-white/5 rounded-xl py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50 hover:border-white/10 outline-none transition-all text-white placeholder-slate-600 shadow-inner"
+                                placeholder="••••••••"
                                 required
                             />
                         </div>
@@ -88,24 +89,20 @@ export default function Login() {
                         type="submit"
                         disabled={isLoading}
                         className={`
-                            w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 
-                            text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-900/30 
-                            transform transition-all duration-200 active:scale-[0.98]
+                            w-full mt-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 
+                            text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] 
+                            transform transition-all duration-300 active:scale-[0.98] hover:-translate-y-0.5
                             ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}
                         `}
                     >
-                        {isLoading ? 'Iniciando sesión...' : 'Ingresar'}
+                        {isLoading ? 'Autenticando...' : 'Acceder al Workspace'}
                     </button>
                 </form>
 
-                <div className="mt-8 text-center">
-                    <p className="text-slate-500 text-sm">
-                        ¿No tienes cuenta? <span className="text-slate-400 cursor-not-allowed">Contacta al administrador</span>
-                    </p>
-                </div>
+
             </div>
 
-            <div className="absolute bottom-4 text-center text-slate-600 text-xs">
+            <div className="absolute bottom-4 text-center text-slate-600 text-xs w-full">
                 &copy; {new Date().getFullYear()} Telos System. All rights reserved.
             </div>
         </div>

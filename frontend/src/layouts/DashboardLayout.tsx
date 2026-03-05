@@ -1,14 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard, Wallet, Calendar, Book, Wrench,
-    Code, Menu, Settings, LogOut, BookOpen, X, Heart
+    Code, Menu, Settings, LogOut, BookOpen, X, Heart, Info
 } from 'lucide-react';
 
 export default function DashboardLayout() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
     const { logout } = useAuth();
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setIsSidebarOpen(true);
+            } else {
+                setIsSidebarOpen(false);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -21,6 +33,7 @@ export default function DashboardLayout() {
         { to: "/theology", icon: BookOpen, label: "Teología" },
         { to: "/programming", icon: Code, label: "Plan" },
         { to: "/josselin", icon: Heart, label: "Josselin" },
+        { to: "/about", icon: Info, label: "Acerca de" },
         { to: "/settings", icon: Settings, label: "Ajustes" },
     ];
 
@@ -43,10 +56,11 @@ export default function DashboardLayout() {
             {/* Sidebar */}
             <aside
                 className={`
-                    fixed md:relative z-50 h-full flex flex-col 
-                    bg-[#12141a]/95 backdrop-blur-2xl border-r border-white/[0.04]
-                    transition-all duration-300 ease-in-out
-                    ${isSidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full opacity-0 overflow-hidden'}
+                    absolute top-0 left-0 md:relative z-50 h-full flex flex-col 
+                    bg-[#12141a]/95 backdrop-blur-2xl border-r border-white/[0.04] shadow-[10px_0_20px_rgba(0,0,0,0.5)] md:shadow-none
+                    transition-transform duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]
+                    w-64 
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                 `}
             >
                 {/* Brand */}
@@ -104,10 +118,9 @@ export default function DashboardLayout() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={toggleSidebar}
-                            className="p-2 rounded-lg text-slate-500 hover:bg-white/5 hover:text-white transition-all active:scale-95"
+                            className="p-2 rounded-lg text-slate-500 hover:bg-white/5 hover:text-white transition-all active:scale-95 md:hidden"
                         >
-                            {isSidebarOpen ? <X className="w-4 h-4 md:hidden" /> : null}
-                            <Menu className="w-4 h-4" />
+                            <Menu className="w-5 h-5" />
                         </button>
                     </div>
                     <div className="w-8"></div>

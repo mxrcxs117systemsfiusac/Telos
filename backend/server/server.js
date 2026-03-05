@@ -135,6 +135,7 @@ import quotesRoutes from '../routes/quotes.js';
 import theologyRoutes from '../routes/theology.js';
 import josselinRoutes from '../routes/josselin.js';
 import engineeringRoutes from '../routes/engineering.js';
+import josselinPlanRoutes from '../routes/josselinPlan.js';
 
 app.use('/api/finance', financeRoutes);
 app.use('/api/schedule', scheduleRoutes);
@@ -145,6 +146,7 @@ app.use('/api/quotes', quotesRoutes);
 app.use('/api/theology', theologyRoutes);
 app.use('/api/josselin', josselinRoutes);
 app.use('/api/engineering', engineeringRoutes);
+app.use('/api/josselin-plan', josselinPlanRoutes);
 
 
 // 404 Handler for Debugging

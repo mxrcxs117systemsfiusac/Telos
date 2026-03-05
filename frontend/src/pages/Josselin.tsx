@@ -3,6 +3,7 @@ import { Heart, Plus, Trash2, X, Sparkles, ThumbsUp, ThumbsDown, Star, User, Boo
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Flipbook from '../components/Flipbook';
+import JosselinProgress from '../components/JosselinProgress';
 
 interface JosselinEntry {
     id: number;
@@ -140,79 +141,87 @@ export default function JosselinPage() {
                             </button>
                         </div>
 
-                        {/* Add Form */}
-                        {showForm && (
-                            <div className="glass-panel p-5 rounded-2xl space-y-3 border-l-4 border-pink-500 animate-slide-down shrink-0 mb-4">
-                                <h4 className="text-sm font-bold text-slate-200">Nueva entrada — {activeCategory.label}</h4>
-                                <input
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-pink-500/50 transition-colors"
-                                    placeholder="Título..."
-                                    value={newEntry.title}
-                                    onChange={e => setNewEntry({ ...newEntry, title: e.target.value })}
-                                />
-                                <textarea
-                                    className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none resize-none h-24 focus:border-pink-500/50 transition-colors"
-                                    placeholder="Descripción (opcional)..."
-                                    value={newEntry.content}
-                                    onChange={e => setNewEntry({ ...newEntry, content: e.target.value })}
-                                />
-                                <div className="flex gap-2">
-                                    <button onClick={() => setShowForm(false)} className="flex-1 bg-white/5 p-2.5 rounded-xl text-sm text-slate-300 hover:bg-white/10 transition-colors">
-                                        Cancelar
-                                    </button>
-                                    <button onClick={handleAdd} className="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 p-2.5 rounded-xl text-sm text-white font-medium hover:shadow-lg hover:shadow-pink-500/25 transition-all">
-                                        Guardar 💖
-                                    </button>
-                                </div>
+                        {activeTab === 'progreso' ? (
+                            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                <JosselinProgress />
                             </div>
-                        )}
-
-                        {/* Entries Grid */}
-                        <div className="flex-1 overflow-y-auto custom-scrollbar">
-                            {filteredEntries.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-16 text-center">
-                                    <div className="text-5xl mb-4 opacity-30">💝</div>
-                                    <p className="text-slate-500 text-sm">No hay entradas en "{activeCategory.label}" aún.</p>
-                                    <p className="text-slate-600 text-xs mt-1">Presiona + para agregar la primera.</p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4 content-start">
-                                    {filteredEntries.map((entry, idx) => (
-                                        <div
-                                            key={entry.id}
-                                            className="group relative bg-[#14161b] border border-white/5 rounded-2xl p-5 hover:border-pink-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-500/5"
-                                            style={{ animationDelay: `${idx * 50}ms` }}
-                                        >
-                                            {/* Delete button */}
-                                            <button
-                                                onClick={() => handleDelete(entry.id)}
-                                                className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
+                        ) : (
+                            <>
+                                {/* Add Form */}
+                                {showForm && (
+                                    <div className="glass-panel p-5 rounded-2xl space-y-3 border-l-4 border-pink-500 animate-slide-down shrink-0 mb-4">
+                                        <h4 className="text-sm font-bold text-slate-200">Nueva entrada — {activeCategory.label}</h4>
+                                        <input
+                                            className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-pink-500/50 transition-colors"
+                                            placeholder="Título..."
+                                            value={newEntry.title}
+                                            onChange={e => setNewEntry({ ...newEntry, title: e.target.value })}
+                                        />
+                                        <textarea
+                                            className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-sm text-slate-200 outline-none resize-none h-24 focus:border-pink-500/50 transition-colors"
+                                            placeholder="Descripción (opcional)..."
+                                            value={newEntry.content}
+                                            onChange={e => setNewEntry({ ...newEntry, content: e.target.value })}
+                                        />
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setShowForm(false)} className="flex-1 bg-white/5 p-2.5 rounded-xl text-sm text-slate-300 hover:bg-white/10 transition-colors">
+                                                Cancelar
                                             </button>
-
-                                            {/* Category indicator */}
-                                            <div className={`w-8 h-1 rounded-full bg-gradient-to-r ${activeCategory.color} mb-4`} />
-
-                                            <h4 className="font-bold text-slate-200 mb-2 pr-6">{entry.title}</h4>
-                                            {entry.content && (
-                                                <p className="text-sm text-slate-400 whitespace-pre-wrap leading-relaxed">{entry.content}</p>
-                                            )}
-
-                                            <div className="mt-4 pt-3 border-t border-white/5">
-                                                <span className="text-[10px] text-slate-600">
-                                                    {new Date(entry.createdAt).toLocaleDateString('es-GT', {
-                                                        day: 'numeric',
-                                                        month: 'short',
-                                                        year: 'numeric'
-                                                    })}
-                                                </span>
-                                            </div>
+                                            <button onClick={handleAdd} className="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 p-2.5 rounded-xl text-sm text-white font-medium hover:shadow-lg hover:shadow-pink-500/25 transition-all">
+                                                Guardar 💖
+                                            </button>
                                         </div>
-                                    ))}
+                                    </div>
+                                )}
+
+                                {/* Entries Grid */}
+                                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                    {filteredEntries.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center py-16 text-center">
+                                            <div className="text-5xl mb-4 opacity-30">💝</div>
+                                            <p className="text-slate-500 text-sm">No hay entradas en "{activeCategory.label}" aún.</p>
+                                            <p className="text-slate-600 text-xs mt-1">Presiona + para agregar la primera.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4 content-start">
+                                            {filteredEntries.map((entry, idx) => (
+                                                <div
+                                                    key={entry.id}
+                                                    className="group relative bg-[#14161b] border border-white/5 rounded-2xl p-5 hover:border-pink-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-500/5"
+                                                    style={{ animationDelay: `${idx * 50}ms` }}
+                                                >
+                                                    {/* Delete button */}
+                                                    <button
+                                                        onClick={() => handleDelete(entry.id)}
+                                                        className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+
+                                                    {/* Category indicator */}
+                                                    <div className={`w-8 h-1 rounded-full bg-gradient-to-r ${activeCategory.color} mb-4`} />
+
+                                                    <h4 className="font-bold text-slate-200 mb-2 pr-6">{entry.title}</h4>
+                                                    {entry.content && (
+                                                        <p className="text-sm text-slate-400 whitespace-pre-wrap leading-relaxed">{entry.content}</p>
+                                                    )}
+
+                                                    <div className="mt-4 pt-3 border-t border-white/5">
+                                                        <span className="text-[10px] text-slate-600">
+                                                            {new Date(entry.createdAt).toLocaleDateString('es-GT', {
+                                                                day: 'numeric',
+                                                                month: 'short',
+                                                                year: 'numeric'
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            </>
+                        )}
                     </>
                 )}
             </div>

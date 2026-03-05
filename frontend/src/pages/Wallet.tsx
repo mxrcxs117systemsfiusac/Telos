@@ -14,9 +14,7 @@ import WalletLock from '../components/WalletLock';
 
 
 export default function WalletPage() {
-    const [walletUnlocked, setWalletUnlocked] = useState(
-        () => sessionStorage.getItem('wallet_unlocked') === 'true'
-    );
+    const [walletUnlocked, setWalletUnlocked] = useState(false);
 
     const {
         ingresos, egresos, pagos, plannedIncomes,
@@ -36,7 +34,6 @@ export default function WalletPage() {
         return (
             <WalletLock
                 onUnlock={() => {
-                    sessionStorage.setItem('wallet_unlocked', 'true');
                     setWalletUnlocked(true);
                 }}
             />
