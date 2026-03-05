@@ -107,7 +107,7 @@ export default function DashboardLayout() {
                         <LogOut className="w-[18px] h-[18px] transition-transform group-hover:-translate-x-0.5" />
                         Cerrar Sesión
                     </button>
-                    <div className="text-[10px] text-center text-slate-700 mt-1">v3.2 &bull; Telos</div>
+                    <div className="text-[10px] text-center text-slate-700 mt-1">v3.4 &bull; Telos</div>
                 </div>
             </aside>
 
