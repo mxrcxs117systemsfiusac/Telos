@@ -1,4 +1,4 @@
-import { Info, User, GraduationCap, MapPin, Mail, Globe, Code2, Server, Database } from 'lucide-react';
+import { Info, User, GraduationCap, MapPin, Globe, Code2, Server, Database } from 'lucide-react';
 
 export default function About() {
     return (

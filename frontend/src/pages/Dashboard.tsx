@@ -3,27 +3,20 @@ import { useState, useEffect } from 'react';
 import {
     Wallet, Calendar, Wrench,
     Code, GraduationCap, BookOpen,
-    Bell, CheckCircle, AlertCircle, Eye, EyeOff,
-    ArrowUpRight, TrendingUp, Sparkles, Target, Clock, Heart
+    Bell, CheckCircle, AlertCircle,
+    ArrowUpRight, Sparkles, Target, Clock, Heart
 } from 'lucide-react';
 import { useFinance } from '../hooks/useFinance';
 import { api } from '../utils/api';
 
 export default function Dashboard() {
     const navigate = useNavigate();
-    const { balance, pagos, isLoaded: financeLoaded } = useFinance();
+    const { pagos } = useFinance();
 
     const [tasks, setTasks] = useState<{ id: number, text: string, description?: string, date: string, source: 'study' | 'plan', completed?: boolean }[]>([]);
     const [verse, setVerse] = useState<{ text: string, citation: string }>({ text: "Cargando...", citation: "" });
     const [quote, setQuote] = useState<{ text: string, author: string }>({ text: "Cargando...", author: "" });
-    const [showBalance, setShowBalance] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
-
-    const toggleBalance = () => {
-        const newState = !showBalance;
-        setShowBalance(newState);
-        localStorage.setItem('finance_show_balance', String(newState));
-    };
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -174,56 +167,34 @@ export default function Dashboard() {
             </header>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Finance Card */}
-                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-emerald-500/30 transition-all p-5">
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-center mb-3">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                                </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Balance</span>
-                            </div>
-                            <button onClick={toggleBalance} className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all">
-                                {showBalance ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                            </button>
-                        </div>
-                        <p className={`text-2xl font-black tracking-tight ${financeLoaded ? 'text-white' : 'animate-pulse bg-white/10 w-24 h-7 rounded-lg'}`}>
-                            {financeLoaded ? (showBalance ? `Q${balance.toLocaleString()}` : '• • • • •') : ''}
-                        </p>
-                        <p className="text-xs text-emerald-400/70 mt-1 font-medium">Balance disponible</p>
-                    </div>
-                </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                 {/* Verse Card */}
-                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-purple-500/30 transition-all p-5">
+                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-purple-500/30 transition-all p-6 md:p-8 flex flex-col justify-center">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-purple-400" />
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center shadow-inner">
+                                <Sparkles className="w-5 h-5 text-purple-400" />
                             </div>
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Versículo</span>
+                            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Versículo</span>
                         </div>
-                        <p className="text-sm italic text-slate-300 leading-relaxed line-clamp-2">"{verse.text}"</p>
-                        <p className="text-xs text-purple-400/70 mt-2 font-semibold">{verse.citation}</p>
+                        <p className="text-base md:text-lg italic text-slate-200 leading-relaxed line-clamp-3">"{verse.text}"</p>
+                        <p className="text-sm text-purple-400/80 mt-3 font-semibold">{verse.citation}</p>
                     </div>
                 </div>
 
                 {/* Motivational Quote Card */}
-                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-rose-500/30 transition-all p-5">
+                <div className="group relative overflow-hidden rounded-2xl bg-[#14161b] border border-white/5 hover:border-rose-500/30 transition-all p-6 md:p-8 flex flex-col justify-center">
                     <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
-                                <Heart className="w-4 h-4 text-rose-400" />
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center shadow-inner">
+                                <Heart className="w-5 h-5 text-rose-400" />
                             </div>
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Frase del día</span>
+                            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Frase del día</span>
                         </div>
-                        <p className="text-sm italic text-slate-300 leading-relaxed line-clamp-2">"{quote.text}"</p>
-                        <p className="text-xs text-rose-400/70 mt-2 font-semibold">{quote.author}</p>
+                        <p className="text-base md:text-lg italic text-slate-200 leading-relaxed line-clamp-3">"{quote.text}"</p>
+                        <p className="text-sm text-rose-400/80 mt-3 font-semibold">{quote.author}</p>
                     </div>
                 </div>
             </div>
