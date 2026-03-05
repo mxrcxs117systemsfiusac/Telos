@@ -1,5 +1,5 @@
 import express from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/index.js';
 import dotenv from 'dotenv';
@@ -40,7 +40,8 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, { expiresIn: '7d' });
         res.json({ token, user: { id: user.id, username: user.username } });
     } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Server error', details: error.message });
     }
 });
 
