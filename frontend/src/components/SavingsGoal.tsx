@@ -26,7 +26,7 @@ export function SavingsGoal({ meta, ahorro, imageUrl, setMeta, setAhorro }: Savi
       {/* Image Gallery / Placeholder */}
       <div className="flex-1 bg-black/20 rounded-xl mb-6 relative group overflow-hidden min-h-[150px] flex items-center justify-center">
         {imageUrl ? (
-          <img src={`http://localhost:3001${imageUrl}`} alt="Goal" className="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" />
+          <img src={imageUrl} alt="Goal" className="w-full h-full object-cover absolute inset-0 transition-opacity duration-500" />
         ) : (
           <div className="text-center text-slate-600">
             <ImageIcon className="w-12 h-12 mx-auto mb-2 opacity-20" />

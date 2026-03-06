@@ -6,7 +6,7 @@ interface AlbumImage {
     url: string;
 }
 
-const FILE_BASE_URL = 'http://localhost:3001';
+
 
 // Component for floating stars background
 const FloatingStars = () => {
@@ -157,7 +157,7 @@ export default function Flipbook({ images }: { images: AlbumImage[] }) {
                         {isFlipping && flipDirection === 'left' && currentPage - 1 >= 0 && (
                             <div className="absolute inset-0 w-full h-full p-2 lg:p-4 z-0">
                                 <img
-                                    src={`${FILE_BASE_URL}${images[currentPage - 1].url}`}
+                                    src={images[currentPage - 1].url}
                                     className="w-full h-full object-cover rounded shadow-sm border border-black/5"
                                     alt="prev"
                                 />
@@ -168,7 +168,7 @@ export default function Flipbook({ images }: { images: AlbumImage[] }) {
                         {isFlipping && flipDirection === 'right' && currentPage + 1 < totalPages && (
                             <div className="absolute inset-0 w-full h-full p-2 lg:p-4 z-0">
                                 <img
-                                    src={`${FILE_BASE_URL}${images[currentPage + 1].url}`}
+                                    src={images[currentPage + 1].url}
                                     className="w-full h-full object-cover rounded shadow-sm border border-black/5"
                                     alt="next"
                                 />
@@ -191,7 +191,7 @@ export default function Flipbook({ images }: { images: AlbumImage[] }) {
                         >
                             <div className="relative w-full h-full rounded shadow-sm border border-black/5 bg-white overflow-hidden">
                                 <img
-                                    src={`${FILE_BASE_URL}${images[currentPage].url}`}
+                                    src={images[currentPage].url}
                                     alt={`Página ${currentPage + 1}`}
                                     className="w-full h-full object-cover"
                                     draggable={false}

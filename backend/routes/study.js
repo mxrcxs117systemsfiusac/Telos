@@ -1,14 +1,8 @@
 import express from 'express';
 import { Task, Resource, Concept } from '../models/index.js';
 import { authenticateToken } from '../middleware/auth.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const DATA_DIR = path.join(__dirname, '../../data');
-const PDF_DIR = path.join(DATA_DIR, 'pdfs');
+import { uploadFile } from '../middleware/upload.js';
+import cloudinary from '../config/cloudinary.js';
 
 const router = express.Router();
 
@@ -19,13 +13,10 @@ router.get('/', authenticateToken, async (req, res) => {
         const concepts = await Concept.findAll({ where: { user_id: req.user.id } });
         const resources = await Resource.findAll({ where: { user_id: req.user.id, type: 'pdf' } });
 
-        // Map resources to pdfs format expected by frontend if needed or just return list
-        // Frontend expects { tasks, concepts, pdfs }
         res.json({
             tasks,
             concepts,
             pdfs: resources,
-            // Categories default or from DB if we had a Category model. For now defaults.
             categories: ['Universidad', 'Iglesia', 'Personal', 'Otro']
         });
     } catch (err) {
@@ -43,7 +34,7 @@ router.post('/tasks', authenticateToken, async (req, res) => {
             subject: category,
             deadline: date,
             status: 'pending',
-            description: description || '' // Save description
+            description: description || ''
         });
         res.json(newItem);
     } catch (err) {
@@ -108,25 +99,14 @@ router.get('/pdfs', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/upload-pdf', authenticateToken, async (req, res) => {
+router.post('/upload-pdf', authenticateToken, uploadFile.single('pdf'), async (req, res) => {
     try {
-        const { name, data } = req.body; // Base64
-        if (!name || !data) return res.status(400).json({ error: 'Missing data' });
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-        // Save File
-        const base64Data = data.split(';base64,').pop();
-        if (!fs.existsSync(PDF_DIR)) fs.mkdirSync(PDF_DIR, { recursive: true });
-
-        // Ensure unique filename to prevent overwrite by other users?
-        // For simplicity, prefix with timestamp or userid
-        const safeName = `${Date.now()}_${name}`;
-        fs.writeFileSync(path.join(PDF_DIR, safeName), base64Data, { encoding: 'base64' });
-
-        // Create Record
         const newResource = await Resource.create({
             user_id: req.user.id,
-            name: name, // Original name
-            url: `/pdfs/${safeName}`,
+            name: req.file.originalname || 'document.pdf',
+            url: req.file.path,       // Cloudinary URL
             type: 'pdf'
         });
 
@@ -146,4 +126,27 @@ router.put('/pdfs/:id', authenticateToken, async (req, res) => {
     }
 });
 
+router.delete('/pdfs/:id', authenticateToken, async (req, res) => {
+    try {
+        const resource = await Resource.findOne({ where: { id: req.params.id, user_id: req.user.id } });
+        if (!resource) return res.status(404).json({ error: 'PDF not found' });
+
+        // Try to extract public_id from Cloudinary URL and delete
+        try {
+            const urlParts = resource.url.split('/');
+            const fileWithExt = urlParts.slice(-2).join('/'); // folder/filename
+            const publicId = fileWithExt.replace(/\.[^/.]+$/, ''); // remove extension
+            await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+        } catch (cloudErr) {
+            console.error('Cloudinary delete error (non-fatal):', cloudErr.message);
+        }
+
+        await resource.destroy();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 export default router;
+

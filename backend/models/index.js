@@ -12,6 +12,7 @@ import ZoomLink from './ZoomLink.js';
 import JosselinEntry from './JosselinEntry.js';
 import MeetLink from './MeetLink.js';
 import JosselinPlan from './JosselinPlan.js';
+import AlbumImage from './AlbumImage.js';
 
 // Define Associations
 const models = {
@@ -27,7 +28,8 @@ const models = {
     ZoomLink,
     JosselinEntry,
     MeetLink,
-    JosselinPlan
+    JosselinPlan,
+    AlbumImage
 };
 
 // User Associations
@@ -67,5 +69,8 @@ MeetLink.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(JosselinPlan, { foreignKey: 'user_id' });
 JosselinPlan.belongsTo(User, { foreignKey: 'user_id' });
 
-export { sequelize, User, FinanceItem, ScheduleEvent, Task, DevotionalEntry, Resource, Concept, Goal, MotivationalQuote, ZoomLink, JosselinEntry, MeetLink, JosselinPlan };
+User.hasMany(AlbumImage, { foreignKey: 'user_id' });
+AlbumImage.belongsTo(User, { foreignKey: 'user_id' });
+
+export { sequelize, User, FinanceItem, ScheduleEvent, Task, DevotionalEntry, Resource, Concept, Goal, MotivationalQuote, ZoomLink, JosselinEntry, MeetLink, JosselinPlan, AlbumImage };
 export default models;

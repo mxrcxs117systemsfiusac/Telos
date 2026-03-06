@@ -42,8 +42,7 @@ export default function JosselinPage() {
     // Fetch album images when album tab is active
     useEffect(() => {
         if (activeTab !== 'album') return;
-        fetch('http://localhost:3001/api/josselin/album')
-            .then(r => r.json())
+        api.get('/josselin/album')
             .then(data => { if (Array.isArray(data)) setAlbumImages(data); })
             .catch(console.error);
     }, [activeTab]);

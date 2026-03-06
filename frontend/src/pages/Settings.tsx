@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Upload, Image, FileText, Database, Check, Trash2, User, Settings, Heart, BookOpen } from 'lucide-react';
 import { api } from '../utils/api';
 
-const FILE_BASE_URL = 'http://localhost:3001';
+
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState('profile');
@@ -54,7 +54,7 @@ export default function SettingsPage() {
     const [uploadingImg, setUploadingImg] = useState(false);
     const [savingsImage, setSavingsImage] = useState<string | null>(null);
     const [pdfs, setPdfs] = useState<{ name: string, url: string }[]>([]);
-    const [albumImages, setAlbumImages] = useState<{ name: string, url: string }[]>([]);
+    const [albumImages, setAlbumImages] = useState<{ id: number, name: string, url: string, public_id?: string }[]>([]);
     const [uploadingAlbum, setUploadingAlbum] = useState(false);
 
     useEffect(() => {
@@ -78,8 +78,7 @@ export default function SettingsPage() {
         }).catch(() => { });
 
         // Album images
-        fetch('http://localhost:3001/api/josselin/album')
-            .then(r => r.json())
+        api.get('/josselin/album')
             .then(data => { if (Array.isArray(data)) setAlbumImages(data); })
             .catch(() => { });
     }, [activeTab]);
@@ -119,31 +118,23 @@ export default function SettingsPage() {
         }
 
         setUploadingImg(true);
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const base64 = reader.result as string;
-            // Sanitize filename: remove spaces, accents, special chars
-            const safeName = file.name
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
-                .replace(/[^a-zA-Z0-9.-]/g, '_'); // Replace special chars with _
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
 
-            try {
-                const json = await api.post('/settings/upload-image', { name: safeName, data: base64 });
+            const json = await api.postFormData('/settings/upload-image', formData);
 
-                // Update finance data "savingsImage"
-                const finData = await api.get('/finance');
-                await api.post('/finance', { ...finData, savingsImage: json.url });
+            // Update finance data "savingsImage"
+            const finData = await api.get('/finance');
+            await api.post('/finance', { ...finData, savingsImage: json.url });
 
-                setSavingsImage(json.url);
-                showStatus('Imagen de Billetera actualizada');
-
-            } catch (err: any) {
-                showStatus(`Error: ${err.message || 'Fallo la carga'}`, true);
-            } finally {
-                setUploadingImg(false);
-            }
-        };
-        reader.readAsDataURL(file);
+            setSavingsImage(json.url);
+            showStatus('Imagen de Billetera actualizada');
+        } catch (err: any) {
+            showStatus(`Error: ${err.message || 'Fallo la carga'}`, true);
+        } finally {
+            setUploadingImg(false);
+        }
     };
 
     const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,22 +146,20 @@ export default function SettingsPage() {
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const base64 = reader.result as string;
-            try {
-                await api.post('/study/upload-pdf', { name: file.name, data: base64 });
+        try {
+            const formData = new FormData();
+            formData.append('pdf', file);
 
-                // Refresh list
-                const dataLists = await api.get('/study/pdfs');
-                setPdfs(dataLists);
+            await api.postFormData('/study/upload-pdf', formData);
 
-                showStatus('PDF subido a la biblioteca');
-            } catch (err) {
-                showStatus('Error al subir PDF', true);
-            }
-        };
-        reader.readAsDataURL(file);
+            // Refresh list
+            const dataLists = await api.get('/study/pdfs');
+            setPdfs(dataLists);
+
+            showStatus('PDF subido a la biblioteca');
+        } catch (err) {
+            showStatus('Error al subir PDF', true);
+        }
     };
 
     const handleDeleteImage = async () => {
@@ -182,14 +171,6 @@ export default function SettingsPage() {
             // Remove from finance data
             await api.post('/finance', { ...finData, savingsImage: null });
 
-            // Optional: Delete physical file if needed, but for now just unset reference
-            if (savingsImage) {
-                const name = savingsImage.split('/').pop();
-                if (name) {
-                    await api.delete(`/settings/images/${name}`);
-                }
-            }
-
             setSavingsImage(null);
             showStatus('Imagen eliminada');
         } catch (err) {
@@ -197,12 +178,12 @@ export default function SettingsPage() {
         }
     };
 
-    const handleDeletePdf = async (name: string) => {
+    const handleDeletePdf = async (id: number, name: string) => {
         if (!confirm(`¿Estás seguro de eliminar el PDF "${name}"?`)) return;
 
         try {
-            await api.delete(`/study/pdfs/${name}`);
-            setPdfs(pdfs.filter(p => p.name !== name));
+            await api.delete(`/study/pdfs/${id}`);
+            setPdfs(pdfs.filter(p => (p as any).id !== id));
             showStatus('PDF eliminado');
         } catch (err) {
             showStatus('Error al eliminar PDF', true);
@@ -430,7 +411,7 @@ export default function SettingsPage() {
                                     <div className="flex flex-col items-center gap-2 text-slate-400">
                                         {savingsImage ? (
                                             <div className="relative">
-                                                <img src={`${FILE_BASE_URL}${savingsImage}`} alt="Current" className="h-32 object-contain rounded-lg border border-white/10" />
+                                                <img src={savingsImage} alt="Current" className="h-32 object-contain rounded-lg border border-white/10" />
                                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                                                     <p className="text-white text-sm font-bold">Click para cambiar</p>
                                                 </div>
@@ -473,7 +454,7 @@ export default function SettingsPage() {
                                             {pdfs.map(pdf => (
                                                 <div key={pdf.name} className="flex justify-between items-center bg-white/5 p-2 rounded-lg border border-white/5">
                                                     <span className="text-sm text-slate-300 truncate max-w-[200px]" title={pdf.name}>{pdf.name}</span>
-                                                    <button onClick={() => handleDeletePdf(pdf.name)} className="text-rose-400 hover:text-rose-300 p-1 rounded-md hover:bg-white/10">
+                                                    <button onClick={() => handleDeletePdf((pdf as any).id, pdf.name)} className="text-rose-400 hover:text-rose-300 p-1 rounded-md hover:bg-white/10">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
@@ -495,24 +476,14 @@ export default function SettingsPage() {
                                         if (!files || files.length === 0) return;
                                         setUploadingAlbum(true);
                                         for (const file of Array.from(files)) {
-                                            const reader = new FileReader();
-                                            await new Promise<void>((resolve) => {
-                                                reader.onload = async () => {
-                                                    try {
-                                                        const res = await fetch('http://localhost:3001/api/josselin/album', {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({ name: file.name, data: reader.result })
-                                                        });
-                                                        const json = await res.json();
-                                                        if (json.success) {
-                                                            setAlbumImages(prev => [...prev, { name: json.name, url: json.url }]);
-                                                        }
-                                                    } catch { }
-                                                    resolve();
-                                                };
-                                                reader.readAsDataURL(file);
-                                            });
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('image', file);
+                                                const json = await api.postFormData('/josselin/album', formData);
+                                                if (json.success) {
+                                                    setAlbumImages(prev => [...prev, { id: json.id, name: json.name, url: json.url, public_id: json.public_id }]);
+                                                }
+                                            } catch { }
                                         }
                                         setUploadingAlbum(false);
                                         showStatus(`${files.length} imagen(es) subida(s) al álbum`);
@@ -531,13 +502,13 @@ export default function SettingsPage() {
                                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                                             {albumImages.map(img => (
                                                 <div key={img.name} className="relative group rounded-xl overflow-hidden border border-white/5 aspect-square">
-                                                    <img src={`http://localhost:3001${img.url}`} alt={img.name} className="w-full h-full object-cover" />
+                                                    <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
                                                     <button
                                                         onClick={async () => {
                                                             if (!confirm('¿Eliminar esta imagen del álbum?')) return;
                                                             try {
-                                                                await fetch(`http://localhost:3001/api/josselin/album/${img.name}`, { method: 'DELETE' });
-                                                                setAlbumImages(prev => prev.filter(i => i.name !== img.name));
+                                                                await api.delete(`/josselin/album/${img.id}`);
+                                                                setAlbumImages(prev => prev.filter(i => i.id !== img.id));
                                                                 showStatus('Imagen eliminada del álbum');
                                                             } catch { showStatus('Error al eliminar', true); }
                                                         }}

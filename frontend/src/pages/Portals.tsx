@@ -511,7 +511,7 @@ const TheologyPage = () => {
                             </div>
                         </div>
                         <div className="flex-1 overflow-auto bg-[#525659] flex justify-center p-4">
-                            <Document file={`http://localhost:3001${selectedPdf.url}`} onLoadSuccess={onDocumentLoadSuccess}>
+                            <Document file={selectedPdf.url} onLoadSuccess={onDocumentLoadSuccess}>
                                 <Page pageNumber={pageNumber} scale={scale} renderTextLayer={false} renderAnnotationLayer={false} className="shadow-2xl" />
                             </Document>
                         </div>

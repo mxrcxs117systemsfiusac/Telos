@@ -33,9 +33,33 @@ async function fetchWithAuth(endpoint: string, method: RequestMethod = 'GET', bo
     return response.json();
 }
 
+async function fetchFormData(endpoint: string, formData: FormData) {
+    const token = localStorage.getItem('token');
+    const headers: HeadersInit = {};
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
 export const api = {
     get: (endpoint: string) => fetchWithAuth(endpoint, 'GET'),
     post: (endpoint: string, body: any) => fetchWithAuth(endpoint, 'POST', body),
     put: (endpoint: string, body: any) => fetchWithAuth(endpoint, 'PUT', body),
     delete: (endpoint: string) => fetchWithAuth(endpoint, 'DELETE'),
+    postFormData: (endpoint: string, formData: FormData) => fetchFormData(endpoint, formData),
 };
+
